@@ -1,12 +1,12 @@
-	.print	". 1541 parallel loader"
 	.namespace iolib {
 	.namespace parallel1541 {
-	.pseudopc $0500 {
+	*= $0500
+{
 
 .var	drive_serial	= false
 .var	ledinverted	= false
 
-	#import	"loader_drive_core.inc"
+	#import	"core.inc"
 
 .label	blk4job	= $04
 .label	blk4trk	= $0e

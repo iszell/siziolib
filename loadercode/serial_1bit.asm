@@ -1,7 +1,11 @@
 	.print	". plus/4 serial 1 bit loader"
 	.namespace iolib {
 	.namespace plus4serial1bit {
-	.pseudopc io_base {
+	#import "iolib_def.inc"
+	#import "plus4_io_map.inc"
+
+	*= io_base
+{
 
 .label bitbuff	= iolib.io_bitbuff
 //C64 (serial bus output is inverted!)
@@ -103,7 +107,7 @@ sync:	ldx #100
 !:	dex
 	bne !-
 	rts
-	#import	"loader_plus4_core.inc"
+	#import	"core.inc"
 
 startload:
 	plus4load(readbyte, writebyte, sync, hardsync)

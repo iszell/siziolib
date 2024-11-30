@@ -1,7 +1,10 @@
 	.print	". plus/4 TCBM loader"
 	.namespace iolib {
 	.namespace plus4tcbm {
-	.pseudopc io_base {
+	#import "plus4_io_map.inc"
+
+	*= io_base
+{
 
 .label	tia	= tcbm_9
 .label	padta	= tia
@@ -61,7 +64,7 @@ writebyte:
 	sta pcdta,x	//DAV=0
 	inc padir,x	//dir=in
 	rts
-	#import	"loader_plus4_core.inc"
+	#import	"core.inc"
 
 startload:
 	plus4load(readbyte, writebyte, sync, hardsync)

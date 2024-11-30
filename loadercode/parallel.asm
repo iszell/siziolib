@@ -1,7 +1,9 @@
-	.print	". plus/4 parallel loader"
 	.namespace iolib {
 	.namespace plus4parallel {
-	.pseudopc io_base {
+	#import "plus4_io_map.inc"
+
+	*= io_base
+{
 
 // default value %11001000
 //  Bit Dir Expl.
@@ -58,7 +60,7 @@ writebyte:
 	lda #%00001000	// Casette motor OFF// CLK=HIGH// DATA=HIGH
 	sta serialdata
 	rts
-	#import	"loader_plus4_core.inc"
+	#import	"core.inc"
 
 startload:
 	plus4load(readbyte, writebyte, sync, hardsync)

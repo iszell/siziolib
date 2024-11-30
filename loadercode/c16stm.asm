@@ -1,7 +1,11 @@
-	.print	". plus/4 C16STM loader"
 	.namespace iolib {
 	.namespace plus4c16stm {
-	.pseudopc io_base {
+	
+	#import "iolib_def.inc"
+	#import "plus4_io_map.inc"
+	*= io_base
+{
+	
 
 #if TEST_C16STM
 .print "!!! TEST BUILD !!!"

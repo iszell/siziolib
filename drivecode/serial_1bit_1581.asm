@@ -1,13 +1,13 @@
-	.print	". 1581 serial 1 bit loader"
 	.namespace iolib {
 	.namespace serial1bit1581 {
-	.pseudopc $0500 {
+	*= $0500
+{
 
 .var	drive_serial	= true
 .var	ledinverted	= false
 
-	#import	"loader_drive_core.inc"
-	#import	"loader_drive_1bitserial.inc"
+	#import	"core.inc"
+	#import	"serial_1bit_core.inc"
 
 .label	blk4job	= $06
 .label	blk4trk	= $13

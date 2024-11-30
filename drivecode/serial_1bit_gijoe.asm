@@ -1,7 +1,7 @@
-	.print	". SD2IEC G.I. Joe loader"
 	.namespace iolib {
 	.namespace sd2iecgiejoe {
-	.pseudopc $0500 {
+	*= $0500
+{
 
 .label	blk4job	= $04
 .label	blk4trk	= $0e

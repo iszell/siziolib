@@ -1,19 +1,17 @@
-C1541			= c1541.bat
-CC1541			= cc1541
-EXOMIZER		= exomizer
-EXOMIZERSFXOPTS	= sfx basic -t 4 -n -s "lda 174 pha" -f "pla sta 174"
-EXOMIZERMEMOPTS	= mem -f -c
-KICKASS			= java -jar $(KICKASSPATH)/KickAss.jar
-KICKASSOPTS		+= -showmem -symbolfile -bytedumpfile $(basename $@).lst
+SUBDIRS := 	drivecode \
+			loadercode
 
-SRCS = $(wildcard *.asm)
-PRGS = $(SRCS:.asm=.prg)
+all: $(SUBDIRS) testdisk.d64 testdisk.d71 testdisk.d81 init.prg initquiet.prg stripped.prg extract
 
-all: testdisk.d64 testdisk.d71 testdisk.d81 init.prg initquiet.prg stripped.prg extract
+include defaults.mk
 
-clean:
-	$(RM) *.prg *.lst *.d?? *.tmp *.sym
-	$(RM) -r sd2iec
+.PHONY: $(SUBDIRS) all
+
+$(SUBDIRS):
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+clean: $(SUBDIRS)
+	$(CLEANCMD)
 
 %.prg: %.asm *.inc
 	$(KICKASS) $(KICKASSOPTS) -o $(basename $@).tmp $<

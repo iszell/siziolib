@@ -1,12 +1,13 @@
-	.print	". 1551 TCBM loader"
 	.namespace iolib {
 	.namespace tcbm1551 {
-	.pseudopc $0500 {
+	*=$0500
+{
 
 .var	drive_serial	= false
 .var	ledinverted	= true
 
-	#import	"loader_drive_core.inc"
+	#import	"core.inc"
+
 .label	cpuport  = $01
 
 .label	blk4job  = $06
