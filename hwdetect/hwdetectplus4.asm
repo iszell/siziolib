@@ -20,4 +20,4 @@
 	#define need_sound_detect
 	#define bypass_vice
 }
-#import "core/iolib.inc"
+#import "../core/iolib.inc"

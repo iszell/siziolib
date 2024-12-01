@@ -26,4 +26,4 @@ quit:
 #define need_loadflag
 #define skip_default_definitions
 #define bypass_vice
-#import "core/iolib.inc"
+#import "../core/iolib.inc"

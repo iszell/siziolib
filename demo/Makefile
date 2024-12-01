@@ -1,6 +1,6 @@
 include ../defaults.mk
 
-all: demo.prg iolibv3test.prg iolibv3exotest.prg bitmapexodata.prg exotestdata.prg
+all: demo.prg iolibv3test.prg iolibv3exotest.prg bitmapexodata.prg exotestdata.prg testdata.prg
 
 clean:
 	$(CLEANCMD)
@@ -14,3 +14,6 @@ bitmapexodata.prg: bitmap1.bin
 
 exotestdata.prg: dotctitle.p4i
 	$(EXOMIZER) $(EXOMIZERMEMOPTS) -o $@ $<
+
+testdata.prg: testdata.asm
+	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<

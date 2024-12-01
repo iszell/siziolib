@@ -1,9 +1,11 @@
 SUBDIRS := 	drivecode \
 			loadercode \
 			depacker \
-			demo
+			loader \
+			demo \
+			hwdetect
 
-all: $(SUBDIRS) testdisk.d64 testdisk.d71 testdisk.d81 init.prg initquiet.prg stripped.prg extract
+all: $(SUBDIRS) testdisk.d64 testdisk.d71 testdisk.d81 extract
 
 include defaults.mk
 
@@ -19,31 +21,7 @@ clean: $(SUBDIRS)
 	$(KICKASS) $(KICKASSOPTS) -o $(basename $@).tmp $<
 	$(EXOMIZER) $(EXOMIZERSFXOPTS) -o $@ $(basename $@).tmp
 
-hwdetect64.prg: hwdetect64.asm
-	$(KICKASS) $(KICKASSOPTS) -define prtstatus -o hwdetect64.tmp hwdetect64.asm
-	$(EXOMIZER) sfx basic -t 64 -n -o $@ hwdetect64.tmp
-
-init.prg: init.asm
-	$(KICKASS) $(KICKASSOPTS) -define prtstatus -o init.tmp init.asm
-	$(EXOMIZER) $(EXOMIZERSFXOPTS) -o $@ init.tmp
-
-initquiet.prg: init.asm
-	$(KICKASS) $(KICKASSOPTS) -o initquiet.tmp init.asm
-	$(EXOMIZER) $(EXOMIZERSFXOPTS) -o $@ initquiet.tmp
-
-stripped.prg: stripped.asm
-	$(KICKASS) $(KICKASSOPTS) -o $@ stripped.asm
-
-strippedtest.prg: strippedtest.asm stripped.asm
-	$(KICKASS) $(KICKASSOPTS) -o $@ strippedtest.asm
-
-testfile.prg: testfile.asm
-	$(KICKASS) $(KICKASSOPTS) -o $@ testfile.asm
-
-testdata.prg: testdata.asm
-	$(KICKASS) $(KICKASSOPTS) -o $@ testdata.asm
-
-testdisk.d64 testdisk.d71 testdisk.d81: $(PRGS) demo/exotestdata.prg demo/bitmapexodata.prg testdata.prg hwdetect64.prg hwdetectplus4.prg strippedtest.prg stripped.prg
+testdisk.d64 testdisk.d71 testdisk.d81: $(SUBDIRS)
 	$(RM) $@
 	$(CC1541) \
 		-n "iolibv3test" \
@@ -52,11 +30,11 @@ testdisk.d64 testdisk.d71 testdisk.d81: $(PRGS) demo/exotestdata.prg demo/bitmap
 		-f iolibv3exotest -w demo/iolibv3exotest.prg \
 		-f b1 -w demo/bitmap1.bin \
 		-f e1 -w demo/bitmapexodata.prg \
-		-f testdata -w testdata.prg \
+		-f testdata -w demo/testdata.prg \
 		-f exotestdata -w demo/exotestdata.prg \
-		-f "hwdetect plus/4" -w hwdetectplus4.prg \
-		-f "hwdetect 64" -w hwdetect64.prg \
-		-f "stripped loader" -w strippedtest.prg \
+		-f "hwdetect plus/4" -w hwdetect/hwdetectplus4.prg \
+		-f "hwdetect 64" -w hwdetect/hwdetect64.prg \
+		-f "stripped loader" -w loader/strippedtest.prg \
 		$@
 
 extract: testdisk.d64

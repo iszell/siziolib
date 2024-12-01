@@ -61,4 +61,4 @@ error:	lda	#$32
 // Include exomizer on-the-fly decruncher
 	#define need_exodecrunch
 }
-#import "core/iolib.inc"
+#import "../core/iolib.inc"
