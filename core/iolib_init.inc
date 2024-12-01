@@ -460,36 +460,36 @@ io_driveloaders:
 io_plus4serial2bit:
 //	#import	"loader_plus4_serial2bit.inc"
 io_plus4serial1bit:
-	#import	"loader_plus4_serial1bit.inc"
+	.import c64 "../loadercode/serial_1bit.prg"
 io_plus4parallel:
-	#import	"loader_plus4_parallel.inc"
+	.import c64 "../loadercode/parallel.prg"
 io_plus4tcbm:
-	#import	"loader_plus4_tcbm.inc"
+	.import	c64 "../loadercode/tcbm.prg"
 io_plus4tcbm_standard:
-	#import	"loader_plus4_tcbm_standard.inc"
+	.import c64 "../loadercode/tcbm_standard.prg"
 io_plus4c16stm:
-	#import	"loader_plus4_c16stm.inc"
+	.import c64 "../loadercode/c16stm.prg"
 io_drv1541ser2:
 //	#import	"loader_drive_2bit1541.inc"
 io_drv1541ser1:
-	#import	"loader_drive_1bit1541.inc"
+	.import c64 "../drivecode/serial_1bit_1541.prg"
 io_drv1581ser2:
 io_drv1581ser1:
-	#import	"loader_drive_1bit1581.inc"
+	.import c64 "../drivecode/serial_1bit_1581.prg"
 io_drv1541par:
-	#import	"loader_drive_parallel1541.inc"
+	.import c64 "../drivecode/parallel_1541.prg"
 io_drvtcbm:
-	#import	"loader_drive_tcbm1551.inc"
+	.import c64 "../drivecode/tcbm_1551.prg"
 io_drvgijoe:
-	#import	"loader_drive_gijoe.inc"
+	.import c64 "../drivecode/serial_1bit_gijoe.prg"
 io_loaderend:
 #endif
 #if need_exodecrunch
 io_decrunchdata:
-	#import	"decrunch.inc"
+	.import c64 "../depacker/decrunch.prg"
 .label io_decrunchdatasize=*-io_decrunchdata
 io_decrunchdata_c16stm:
-	#import	"decrunch_c16stm.inc"
+	.import c64 "../depacker/decrunch_c16stm.prg"
 .label io_decrunchdatasize_c16stm=*-io_decrunchdata_c16stm
 
 #endif

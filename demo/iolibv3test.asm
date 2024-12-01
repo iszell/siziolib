@@ -98,4 +98,4 @@ counter:
 	#define need_sound_detect
 	#define need_loader
 }
-#import "iolib.inc"
+#import "../core/iolib.inc"

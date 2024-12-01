@@ -1,7 +1,9 @@
-	.print	". exomizer decruncher"
 	.namespace iolib {
 	.namespace iolibdecrunch {
-	.pseudopc decrunch {
+	#import "ted.inc"
+	#import "iolib_def.inc"
+	*= decrunch
+{
 
 	tya
 	pha

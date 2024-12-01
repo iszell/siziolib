@@ -1,6 +1,6 @@
 include ../defaults.mk
 
-all: serial_1bit_1541.prg serial_1bit_1581.prg serial_1bit_gijoe.prg parallel_1541.prg tcbm_1551.asm
+all: serial_1bit_1541.prg serial_1bit_1581.prg serial_1bit_gijoe.prg parallel_1541.prg tcbm_1551.prg
 
 clean:
 	$(CLEANCMD)

@@ -42,4 +42,4 @@ end:	lda	ptr+1
 	#define need_memory_detect
 	#define need_sound_detect
 }
-#import "iolib.inc"
+#import "core/iolib.inc"

@@ -220,13 +220,13 @@ endvice:
 #endif
 
 #if	need_memory_detect
-	#import	"detect_memory.inc"
+	#import	"../detect/detect_memory.inc"
 #endif
 #if	need_sound_detect
-	#import	"detect_sound.inc"
+	#import	"../detect/detect_sound.inc"
 #endif
-	#import	"detect_drive.inc"
- 	#import	"iolib_init.inc"
+	#import	"../detect/detect_drive.inc"
+ 	#import	"../core/iolib_init.inc"
 }
 
 /*

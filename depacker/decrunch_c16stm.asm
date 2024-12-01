@@ -1,7 +1,9 @@
-	.print	". exomizer decruncher for C16STM"
 	.namespace iolib {
 	.namespace iolibdecrunch {
-	.pseudopc decrunch {
+	#import "ted.inc"
+	#import "iolib_def.inc"
+	*= decrunch
+{
 
 // Specialized exomizer decruncher for loaders with no driveside code
 	tya
@@ -26,6 +28,7 @@ getcmem2: {
 	plp
 	rts
 }
+	#import	"exodecrunch.inc"
 dodecrunch2:
 	exodecrunch(getcmem2)
 }

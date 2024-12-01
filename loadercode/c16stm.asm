@@ -2,7 +2,7 @@
 	.namespace plus4c16stm {
 	
 	#import "iolib_def.inc"
-	#import "plus4_io_map.inc"
+	#import "ted.inc"
 	*= io_base
 {
 	

@@ -384,4 +384,4 @@ runsec:
 	#define need_loader
 	#define need_exodecrunch
 }
-#import "iolib.inc"
+#import "../core/iolib.inc"

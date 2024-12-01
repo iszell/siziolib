@@ -2,7 +2,7 @@
 	.namespace iolib {
 	.namespace plus4serial1bit {
 	#import "iolib_def.inc"
-	#import "plus4_io_map.inc"
+	#import "ted.inc"
 
 	*= io_base
 {

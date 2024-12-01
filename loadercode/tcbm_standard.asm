@@ -1,7 +1,8 @@
 	.print	". plus/4 TCBM loader"
 	.namespace iolib {
 	.namespace plus4tcbm_standard {
-	#import "plus4_io_map.inc"
+	#import "iolib_def.inc"
+	#import "ted.inc"
 
 	*= io_base
 {
