@@ -1,5 +1,3 @@
-!init*.prg
-!testdisk.d*
 ByteDump.txt
 *.prg
 *.d64
@@ -10,3 +8,6 @@ ByteDump.txt
 *.log
 *.sym
 *.bak
+!init*.prg
+!testdisk.d*
+make/*

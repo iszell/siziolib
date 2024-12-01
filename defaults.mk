@@ -2,10 +2,10 @@ BINDIR=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))bin
 INCDIR=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))include
 
 C1541			= c1541.bat
-CC1541			= cc1541
+CC1541			= $(BINDIR)/cc1541
 BITNAX			= $(BINDIR)/bitnax
 BITNAXOPTS		= --bitfire --plus4
-EXOMIZER		= exomizer
+EXOMIZER		= $(BINDIR)/exomizer
 EXOMIZERSFXOPTS	= sfx basic -t 4 -n -s "lda 174 pha" -f "pla sta 174"
 EXOMIZERMEMOPTS	= mem -f -c
 #KICKASS			= java -cp $(BINDIR)/KickAss.jar:$(BINDIR)/kickass-cruncher-plugins-2.0.jar kickass.KickAssembler
