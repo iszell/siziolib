@@ -53,9 +53,9 @@
 	sta	ted.bitmapctrl
 	lda	#$58
 	sta	ted.screenaddr
-	lda	$5bfe
+	lda	#$31
 	sta	ted.background
-	lda	$5bff
+	lda	#$00
 	sta	ted.color1
 	lda	#0
 	sta	$ff19

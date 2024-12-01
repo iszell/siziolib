@@ -8,6 +8,6 @@ ByteDump.txt
 *.log
 *.sym
 *.bak
-!init*.prg
+make
+!sd2iec/*
 !testdisk.d*
-make/*

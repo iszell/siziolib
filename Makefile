@@ -32,8 +32,10 @@ testdisk.d64 testdisk.d71 testdisk.d81: $(SUBDIRS)
 		-f e1 -w demo/bitmapexodata.prg \
 		-f testdata -w demo/testdata.prg \
 		-f exotestdata -w demo/exotestdata.prg \
-		-f "hwdetect plus/4" -w hwdetect/hwdetectplus4.prg \
-		-f "hwdetect 64" -w hwdetect/hwdetect64.prg \
+		-f "hwdetect-plus4" -w hwdetect/hwdetectplus4.prg \
+		-f "hwdetect-64" -w hwdetect/hwdetect64.prg \
+		-f "init" -w loader/init.prg \
+		-f "initquiet" -w loader/initquiet.prg \
 		-f "stripped loader" -w loader/strippedtest.prg \
 		$@
 
