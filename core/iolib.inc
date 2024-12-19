@@ -1,7 +1,7 @@
-// IOLibV3 by Siz of ~TBC~ Absence
+// IOLib by Siz of ~TBC~ Absence
 // (c) Siz, 2014.06.03
 //
-// Change log:
+// Change log V3:
 // 	2014.06.03: first touch
 //	2015.04.27: implemented sound and memory size detection
 //	2015.04.28: implemented drive type detection
@@ -24,6 +24,8 @@
 //	2024.01.27: C16STM support
 //	2024.08.11: YaPE 1551 IEC and SD2TCBM detection
 //	2024.08.21: Detect CPU port type
+// Change log V4:
+//	2024.11.30: Starting V4 branch
 
 	#import "iolib_def.inc"
 

@@ -1,7 +1,7 @@
 #importonce
-.print("Siz IOLibV3 definitions")
+.print("Siz IOLib definitions")
 .namespace iolib {
-// IOLibV3 definitions to be included in programs where you use it
+// IOLib definitions to be included in programs where you use it
 
 #if skip_default_definitions
 #else

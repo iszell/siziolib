@@ -1,4 +1,6 @@
 	#import	"kernal_table.inc"
+	#import	"c64_c128_io_map.inc"
+	#import	"fm.inc"
 
 	.encoding	"petscii_mixed"
 
@@ -6,13 +8,14 @@
 
 	BasicUpstart2(start)
 start:	jsr	primm
-	.text	"Hardware detect using IOLibV3 by Siz"
+	.text	"Hardware detect using IOLib by Siz"
 	.byte	14, 13, 0
 
 	jsr	iolib.detect
 	rts
 
-primm:	pla
+primm:	{
+	pla
 	sta	ptr
 	pla
 	sta	ptr+1
@@ -29,17 +32,32 @@ end:	lda	ptr+1
 	lda	ptr
 	pha
 	rts
-
-.namespace fm {
-	.label	address	= $df40
-	.label	data	= address + $10
-	.label	status	= address + $20
 }
 
-.namespace iolib {
-	#define	prtstatus
-	#define need_video_detect
-	#define need_memory_detect
-	#define need_sound_detect
+hexbout: {
+	pha
+	lsr
+	lsr
+	lsr
+	lsr
+	jsr print
+	pla
+	and #$0f
+print:
+	cmp #10
+	bcc !+
+	adc #6
+!:	adc #'0'
+	jmp chrout
 }
-#import "../core/iolib.inc"
+
+	#define io_prtstatus
+	#define io_detect_video
+	#define io_detect_sound
+	#define io_detect_drive
+	#define io_memory_size
+	#define io_detect_emulator
+//	#define io_halt_on_vice
+	#define io_detect_cpu_port
+
+	#import "../detect/detect.inc"

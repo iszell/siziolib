@@ -1,0 +1,261 @@
+//	#import "iolib_def.inc"
+	.print	"Siz IOLib hardware detection code"
+	.encoding "petscii_mixed"
+
+	.namespace iolib {
+detected_hardware:
+	.memblock "Detected hardware data"
+#if io_detect_sound
+	// 0: none
+	// 1: C64/C128 standard
+	// 2: legacy SIDCard/ReSeed
+	// 3: NAE/CAE
+	sid_card_type:
+		.byte 0
+	sid_card_version:
+		.byte 0
+	sid_1_model:
+		.byte 0
+	sid_1_address:
+		.word 0
+/*
+	sid_2_model:
+		.byte 0
+	sid_2_address:
+		.word 0
+*/
+#if HAS_AY
+	// 0: none
+	// 1: AY-3-891x
+	// 2: YM2149
+	ay_model:
+		.byte 0
+	ay_address:
+		.word 0
+#endif
+#if HAS_FM
+	fm_model:
+		.byte 0
+	fm_address:
+		.word 0
+#endif
+#if HAS_DAC
+	dac_card_type:
+		.byte 0
+	dac_card_version:
+		.byte 0
+	dac_model:
+		.byte 0
+	dac_address:
+		.word 0
+#endif
+#endif
+#if io_detect_drive
+	drive_number:
+		.byte 0
+	drive_model:
+		.byte 0
+	drive_version:
+		.byte 0
+	drive_interface_type:
+		.byte 0
+#endif
+#if io_detect_cpu_port
+	cpu_port_type:
+		.byte 0
+#endif
+#if io_memory_size
+	memory_size:
+		.word 0
+	memory_expansion_type:
+		.word 0
+#endif
+.const detected_hardware_area_size = * - detected_hardware
+.print ". Detected hardware data allocates " + detected_hardware_area_size + " bytes"
+
+.memblock "Hardware detection main code"
+detect: {
+#if io_prtstatus
+	jsr primm
+	.text @"\$08\$0eDetecting hardware:\$0d\$00"
+#endif
+	ldx #detected_hardware_area_size-1
+	lda #0
+!:	sta detected_hardware,x
+	dex
+	bpl !-
+
+#if io_detect_video
+	jsr detect_video_standard
+#endif
+#if io_detect_sound
+	jsr detect_sound
+#endif
+#if io_detect_drive
+#endif
+#if io_memory_size
+#endif
+#if io_detect_cpu_port
+	jsr detect_cpu_port_type
+#endif
+#if io_detect_emulator
+	jsr detect_emulator
+#endif
+	rts
+}
+
+#if io_detect_video
+	.print ". Video standard detection"
+	.memblock "Video standard detection"
+	detect_video_standard: {
+	#if HAS_TED
+			#if io_prtstatus
+				jsr primm
+				.text @" Video standard: \$00"
+			lda ted.ctrl2
+			and #%01000000
+			lsr
+			lsr
+			lsr
+			tax
+			ldy #4
+		!:	lda video_standard_name,x
+			jsr chrout
+			inx
+			dey
+			bne !-
+			lda #13
+			jsr chrout
+			#endif
+	#endif
+	rts
+	#if io_prtstatus
+		video_standard_name:
+			.text "PAL NTSC"
+	#endif
+	}
+#endif
+
+#if io_detect_cpu_port
+	.print ". CPU I/O port type detection"
+	.memblock "CPU I/O port type detection"
+	detect_cpu_port_type: {
+		#if HAS_TED
+			lda cpu_port
+			pha
+			#if	io_prtstatus
+				jsr	primm
+				.text	@" CPU port type: \$00"
+			#endif
+			lda cpu_port
+			and #~%00000001
+			sta cpu_port
+			bit cpu_port
+			bpl not7501
+			ora #%00000001
+			sta cpu_port
+			bit cpu_port
+			bmi not7501
+			and #%00100000
+			bne not7501
+			#if io_prtstatus
+				jsr	primm
+				.text	@"7501/8501\$00"
+			#endif
+			lda cpu_dir
+			ora #%00100000
+			sta cpu_dir
+			lda cpu_dir
+			and #%00100000
+			beq not6502plus4
+			#if io_prtstatus
+				jsr	primm
+				.text	@" compatible\$00"
+			#endif
+		not6502plus4:
+			jmp cpuend
+		not7501:
+			and #%11000000
+			eor #%11000000
+			bne not6502
+			lda cpu_port
+			and #~%00000011
+			sta cpu_port
+			lda cpu_port
+			and #%00100000
+			beq not6502
+			#if io_prtstatus
+				jsr	primm
+				.text	@"6502/8500\$00"
+			#endif
+			lda #1
+			sta cpu_port_type
+			bne incompatbile
+		not6502:
+			#if io_prtstatus
+			jsr	primm
+			.text	@"Unsupported\$00"
+			#endif
+			lda #2
+			sta cpu_port_type
+		incompatbile:
+			#if io_halt_on_6502
+				#if io_prtstatus
+					jsr	primm
+					.text	@". Incompatible, stopping\$00"
+				#endif
+				lda #$77
+				sta ted.border
+				.byte $02
+			#endif
+		cpuend:
+			#if io_prtstatus
+			lda #13
+			jsr chrout
+			#endif
+			pla
+			sta cpu_port
+		#endif
+		rts
+	}
+#endif
+
+#if io_detect_emulator
+	.print ". Emulator detection"
+	.memblock "Emulator detection"
+	detect_emulator: {
+		#if HAS_TED
+			lda $fdd0
+			ldx #0
+		!:  ora $fdd0
+			bne notvice
+			dex
+			bne !-
+			#if io_prtstatus
+				jsr	primm
+				.text	@" VICE xplus4 detected\$00"
+			#endif
+			#if io_halt_on_vice
+				#if io_prtstatus
+					jsr	primm
+					.text	@". Stopping\$00"
+				#endif
+				lda #$56
+				sta ted.border
+				.byte $02
+			#endif
+			lda #13
+			jmp chrout
+		notvice:
+		#endif
+		rts
+	}
+#endif
+
+#if io_detect_sound
+	#import "detect_sound.inc"
+#endif
+//	#import "detect_drive.inc"
+//	#import "detect_memory.inc"
+}
+

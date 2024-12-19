@@ -99,17 +99,18 @@
 // Default value: $ff
 .label	romexpctrl	= $fd17
 
+#define HAS_AY
+.label	ay_base		= $fd21
+
 .label	sid_solder	= $fd40
 .label	nae_control	= $fd80
+
+#define HAS_FM
+.label	fm_base		= $fde2
+.const	fm_reg_step	= $1
+
 .label	sid_csory	= $fe80
 
-// AY-3-8910 (DIGIMUZ) registers (http://plus4world.powweb.com/hardware/DIGIMUZ)
-// write register number to address then read from read register or write to write register
-.namespace ay {
-	.label	read	= $fd21
-	.label	write	= read + 1
-	.label	address	= write + 1
-}
 
 // SideKick NeoRAM (https://github.com/frntc/Sidekick64)
 // block: select 16k block of memory (max. 4M)
@@ -120,14 +121,6 @@
 	.label	window	= $fde8
 	.label	block	= window + 1
 	.label	page	= block + 1
-}
-
-// SideKick OPL2 FM (https://github.com/frntc/Sidekick64)
-// Write register number to address register, wait 6us, read/write data register and wait 35us
-.namespace fm {
-	.label	address	= $fde2
-	.label	data	= address + 1
-	.label	status	= address + 2
 }
 
 // C16STM registers (http://joco.homeserver.hu/c16stm/)
