@@ -30,7 +30,9 @@ detect_sound:
 	#if HAS_FM
 		jsr detect_fm
 	#endif
-	jsr detect_dac
+	#if HAS_DAC
+		jsr detect_dac
+	#endif
 	rts
 
 detect_sid: {
@@ -40,13 +42,18 @@ detect_sid: {
 		sta sidptr
 		stx sidptr+1
 		jsr detect_sid_address
-		bcc !+
+		bcc foundsid
+	#if io_prtstatus
+		bit debug_mode
+		bpl !+
+		jsr prtcr
+	!:
+	#endif
 		lda #<sid_csory
 		ldx #>sid_csory
 		sta sidptr
 		stx sidptr+1
 		jsr detect_sid_address
-	!:
 	#endif
 	#if !HAS_TED
 		lda #<sid_base
@@ -56,10 +63,17 @@ detect_sid: {
 		jsr detect_sid_address
 	#endif
 	
-	bcc !+
+	bcc foundsid
+	#if io_prtstatus
+		bit debug_mode
+		bpl !+
+		jsr prtcr
+	!:	sec
+	#endif
 	rts
 
-!:	lda sidptr
+foundsid:
+	lda sidptr
 	ldx sidptr+1
 	sta sid_1_address
 	stx sid_1_address+1
@@ -106,6 +120,7 @@ detect_sid: {
 		cmp #3
 		bne noprintnae
 		jsr prtspace
+	printnae:
 		ldx #'N'
 		and #$70
 		cmp #$10
@@ -291,14 +306,95 @@ writefmreg:
 		lda fmstat2
 		jsr hexbout
 		jsr prtcr
-	!:
+	!:	rts
 	#endif
 }
 #endif
 
+#if HAS_DAC
 detect_dac: {
+/*
+	#if !HAS_TED
+*/
+		sec
+		rts
+/*
+	#endif
+	#if HAS_TED
+		lda sid_card_type
+		cmp #3
+		bne nonae
+		lda #2
+		bne found
+	nonae:
+		lda sid_solder+$1f
+		and sid_solder+$1f
+		tax
+		lda sid_csory+$1f
+		and sid_csory+$1f
+		stx dac1
+		sta dac2
+		lda dac1: #0
+		cmp dac2: #0
+		bne notfound
+		cmp #0
+		beq notfound
+		lda #1
+		bne found
+	notfound:
+		sec
+		.byte BIT_ZP
+	found:
+		clc
+		php
+		pha
+	#if io_prtstatus
+		bit debug_mode
+		bpl !+
+		jsr primm
+		.text @"?DAC: \$00"
+		lda dac1
+		jsr hexbout
+		jsr prtspace
+		lda dac2
+		jsr hexbout
+		jsr prtcr
+	!:
+	#endif
+		pla
+		plp
+		bcc !+
+		rts
+	!:	sta dac_model
+		clc
+		lda sid_1_address
+		adc #$1e
+		sta dac_address
+		lda sid_1_address+1
+		adc #0
+		sta dac_address+1
+	#if io_prtstatus
+		jsr primm
+		.text @"  DAC \$00"
+		lda dac_address
+		ldx dac_address+1
+		jsr printaddr
+
+		lda dac_model
+		cmp #2
+		bne !+
+		jsr detect_sid.printnae
+		jmp end
+	!:	jsr primm
+		.text @"DigiBlaster\$0d\$00"
+	#endif
+end:
+	clc
+	#endif
 	rts
+*/
 }
+#endif
 
 // Detect SID address
 //=======================================

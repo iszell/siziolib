@@ -102,6 +102,7 @@
 #define HAS_AY
 .label	ay_base		= $fd21
 
+#define HAS_DAC
 .label	sid_solder	= $fd40
 .label	nae_control	= $fd80
 

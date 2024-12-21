@@ -41,10 +41,10 @@ detected_hardware:
 		.word 0
 #endif
 #if HAS_DAC
-	dac_card_type:
-		.byte 0
-	dac_card_version:
-		.byte 0
+//	dac_card_type:
+//		.byte 0
+//	dac_card_version:
+//		.byte 0
 	dac_model:
 		.byte 0
 	dac_address:
@@ -126,7 +126,7 @@ init: {
 		cmp #'d'
 		bne nodebug
 		jsr primm
-		.text @" !Debug mode enabled!\$0d\$00"
+		.text @"?Debug output enabled!\$0d\$00"
 		lda #-1
 		.byte BIT_ABS
 	#endif
