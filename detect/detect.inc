@@ -6,6 +6,17 @@
 	.namespace detect {
 detected_hardware:
 	.memblock "Detected hardware data"
+#if io_detect_memory_size
+	// 0: Stock
+	// 1: Hannes
+	// 2: Csory
+	// 3: NeoRAM
+	memory_expansion_type:
+		.byte 0
+	// in kiloBytes
+	memory_size:
+		.word 0
+#endif
 #if io_detect_sound
 	// 0: none
 	// 1: C64/C128 standard
@@ -35,20 +46,27 @@ detected_hardware:
 		.word 0
 #endif
 #if HAS_FM
+	// 0: none
+	// 1: OPL/OPL-II
 	fm_model:
 		.byte 0
 	fm_address:
 		.word 0
 #endif
 #if HAS_DAC
-//	dac_card_type:
-//		.byte 0
-//	dac_card_version:
-//		.byte 0
+/*
+	// 0: none
+	// 1: DigiBlaster
+	// 2: NAE/CAE
+	dac_card_type:
+		.byte 0
+	dac_card_version:
+		.byte 0
 	dac_model:
 		.byte 0
 	dac_address:
 		.word 0
+*/
 #endif
 #endif
 #if io_detect_drive
@@ -60,16 +78,12 @@ detected_hardware:
 		.byte 0
 	drive_interface_type:
 		.byte 0
+	drive_serial_drives:
+		.byte 0
 #endif
 #if io_detect_cpu_port
 	cpu_port_type:
 		.byte 0
-#endif
-#if io_memory_size
-	memory_size:
-		.word 0
-	memory_expansion_type:
-		.word 0
 #endif
 .const detected_hardware_area_size = * - detected_hardware
 .print ". Detected hardware data allocates " + detected_hardware_area_size + " bytes"
@@ -89,18 +103,32 @@ detect: {
 #if io_detect_video
 	jsr detect_video_standard
 #endif
+#if io_detect_memory_size
+	jsr detect_memory_size.detect
+#endif
 #if io_detect_sound
 	jsr detect_sound.detect_sound
 #endif
 #if io_detect_drive
-#endif
-#if io_memory_size
 #endif
 #if io_detect_cpu_port
 	jsr detect_cpu_port_type
 #endif
 #if io_detect_emulator
 	jsr detect_emulator
+#endif
+#if io_prtstatus
+	bit debug_mode
+	bmi !+
+	rts
+	ldx #0
+!:	lda detected_hardware,x
+	jsr hexbout
+	jsr prtspace
+	jsr prtspace
+	inx
+	cpx #detected_hardware_area_size
+	bne !-
 #endif
 	rts
 }
@@ -294,10 +322,12 @@ prtcr: {
 }
 #endif
 
+#if io_detect_memory_size
+	#import "detect_memory.inc"
+#endif
 #if io_detect_sound
 	#import "detect_sound.inc"
 #endif
 //	#import "detect_drive.inc"
-//	#import "detect_memory.inc"
 }
 }

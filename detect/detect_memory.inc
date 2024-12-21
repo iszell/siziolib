@@ -1,7 +1,10 @@
-	.print	". memory size detection"
+	.memblock "Memory size detection"
+	.print	". Memory size detection"
 	.namespace iolib {
+	.namespace detect {
+	.namespace detect_memory_size {
 
-detect_memsize:
+detect:
 {
 #if !HAS_TED
 	rts
@@ -14,7 +17,6 @@ detect_memsize:
 // Reset Hannes expansion control
 	sty	ramexpctrl_hannes
 	iny
-	sty	io_ramsize
 	sty	ted.ramen
 
 // Save and Reset detection address contents
@@ -40,7 +42,7 @@ detect_memsize:
 	beq	!+
 // We have at least 64k	
 	iny
-!:	sty	io_ramsize
+!:	sty	memsize
 	cpy	#2
 	bne	!+
 	jsr	io_detmem_hannes
@@ -57,50 +59,50 @@ detect_memsize:
 	sta	ted.romen
 	cli
 
-	#if	prtstatus
+	#if	io_prtstatus
 	jsr	primm
-	.text	" RAM: "
-	.byte	0
+	.text	@" RAM: \$00"
 	sei
 	sta	ted.ramen
-	lda	io_ramsize
+	lda	memsize
 	sta	ted.romen
 	pha
 	cli
 	and	#%00011111
 	asl
 	tay
-	ldx	io_ramsizes,y
-	lda	io_ramsizes+1,y
+	ldx	memsizes,y
+	stx memory_size
+	lda	memsizes+1,y
+	sta memory_size+1
 	jsr	lnprt
 	lda	#'k'
 	jsr	chrout
 	pla
 	pha
 	bpl	!+
+	inc memory_expansion_type
 	jsr	primm
-	.text	" Hannes"
-	.byte	0
+	.text	@" Hannes\$00"
 !:	pla
 	pha
 	and	#%01000000
 	beq	!+
+	inc memory_expansion_type
 	jsr	primm
-	.text	" Csory"
-	.byte	0
+	.text	@" Csory\$00"
 !:	pla
 	and	#%00100000
 	beq	!+
-	jsr	prtspc
+	jsr	prtspace
 	lda	io_detmemtemp
 	asl
 	tay
-	ldx	io_ramsizes,y
-	lda	io_ramsizes+1,y
+	ldx	memsizes,y
+	lda	memsizes+1,y
 	jsr	lnprt
 	jsr	primm
-	.text	"k NeoRAM"
-	.byte	0
+	.text	@"k NeoRAM\$00"
 !:	jsr	prtcr
 	#endif
 	rts
@@ -168,7 +170,7 @@ io_detmem_hannes:
 	bcc	!+
 	tya
 	ora	#%10000000
-	sta	io_ramsize
+	sta	memsize
 !:	rts	
 }
 
@@ -219,15 +221,15 @@ io_detmem_csory: {
 	cpy	#3
 	bcc	!+
 	lda	#%01000000
-	ora	io_ramsize
-	sta	io_ramsize
+	ora	memsize
+	sta	memsize
 	and	#%00111111
 	cmp	io_detmemtemp
 	bcs	!+
-	lda	io_ramsize
+	lda	memsize
 	and	#%11000000
 	ora	io_detmemtemp
-	sta	io_ramsize
+	sta	memsize
 	// Turn off Csory and reset Hannes expansion
 !:	lda	#%11111111
 	sta	ramexpctrl_hannes
@@ -277,17 +279,21 @@ io_detmem_neoram: {
 !:	tya
 	beq	!+
 	lda	#%00100000
-	ora	io_ramsize
-	sta	io_ramsize
+	ora	memsize
+	sta	memsize
 !:	rts
 }
 
+memsize:
+	.byte $0
 io_detmemtemp:
 	.byte	0
-	#if	prtstatus
-io_ramsizes:
+	#if	io_prtstatus
+memsizes:
 	.word 16, 32, 64, 128, 256, 512, 1024, 2048, 4096
 	#endif
 #endif
+}
+}
 }
 }
