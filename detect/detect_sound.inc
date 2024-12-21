@@ -8,6 +8,8 @@
 	.memblock "Sound detection"
 	.print	". Sound source detection"
 	.namespace iolib {
+	.namespace detect {
+	.namespace detect_sound {
 
 detect_sound:
 {
@@ -61,30 +63,11 @@ detect_sid: {
 	ldx sidptr+1
 	sta sid_1_address
 	stx sid_1_address+1
-	#if io_prtstatus
-		jsr primm
-		.text @"  SID \$00"
-		lda sidptr
-		ldx sidptr+1
-		jsr printaddr
-	#endif
 	jsr detect_sid_model
 	ldx #1
 	bcs !+
 	inx
 !:	stx sid_1_model
-	#if io_prtstatus
-		txa
-		asl
-		asl
-		tax
-		ldy #4
-	!:	lda sid_models-4,x
-		jsr chrout
-		inx
-		dey
-		bne !-
-	#endif
 	#if !HAS_TED
 		lda #1
 		sta sid_card_type
@@ -97,8 +80,32 @@ detect_sid: {
 		inc sid_card_type
 		and #$7f
 		sta sid_card_version
-		lda #' '
+	nonae:
+	#endif
+	#if io_prtstatus
+		bit debug_mode
+		bpl !+
+		jsr prtcr
+	!:
+		jsr primm
+		.text @"  SID \$00"
+		lda sidptr
+		ldx sidptr+1
+		jsr printaddr
+		lda sid_1_model
+		asl
+		asl
+		tax
+		ldy #4
+	!:	lda sid_models-4,x
 		jsr chrout
+		inx
+		dey
+		bne !-
+		lda sid_card_type
+		cmp #3
+		bne noprintnae
+		jsr prtspace
 		ldx #'N'
 		and #$70
 		cmp #$10
@@ -121,11 +128,8 @@ detect_sid: {
 		and #$0f
 		ora #'0'
 		jsr chrout
-	nonae:
-	#endif
-	#if io_prtstatus
-		lda #13
-		jsr chrout
+	noprintnae:
+		jsr prtcr
 	#endif
 	rts
 
@@ -147,6 +151,19 @@ detect_ay: {
 	lda	#AY_TEST_DATA
 	jsr	writeayreg
 	jsr	readayreg
+	#if io_prtstatus
+		bit debug_mode
+		bpl !+
+		pha
+		jsr primm
+		.text @"?AY: \$00"
+		pla
+		pha
+		jsr hexbout
+		jsr prtcr
+		pla
+	!:
+	#endif
 	ldx #2
 	cmp #AY_TEST_DATA
 	beq ym2149
@@ -174,8 +191,7 @@ ym2149:
 		jmp !+
 	ym:	jsr primm
 		.text @"YM2149\$00"
-	!:	lda #13
-		jsr chrout
+	!:	jsr prtcr
 	#endif
 	clc
 	.byte BIT_ZP
@@ -226,17 +242,23 @@ detect_fm: {
 
 	lda	fmstat2: #0
 	cmp	#$c0
-	beq	!++
-!:	sec
+	beq	found
+!:
+	#if io_prtstatus
+		jsr fmdebug
+	#endif
+	sec
 	rts
 
-!:	lda #1
+found:
+	lda #1
 	sta fm_model
 	lda #<fm_base
 	ldx #>fm_base+1
 	sta fm_address
 	stx fm_address+1
 	#if io_prtstatus
+		jsr fmdebug
 		jsr primm
 		.text @"  FM  \$00"
 		lda fm_address
@@ -256,30 +278,27 @@ writefmreg:
 	sta	fm.data
 	.for	(var i=0; i<21; i++) nop
 	rts
+
+	#if io_prtstatus
+	fmdebug:
+		bit debug_mode
+		bpl !+
+		jsr primm
+		.text @"?FM: \$00"
+		lda fmstat1
+		jsr hexbout
+		jsr prtspace
+		lda fmstat2
+		jsr hexbout
+		jsr prtcr
+	!:
+	#endif
 }
 #endif
 
 detect_dac: {
 	rts
 }
-
-#if io_prtstatus
-	printaddr: {
-		pha
-		lda #'@'
-		jsr chrout
-		lda #'$'
-		jsr chrout
-		txa
-		jsr hexbout
-		pla
-		jsr hexbout
-		lda #':'
-		jsr chrout
-		lda #' '
-		jmp chrout
-	}
-#endif
 
 // Detect SID address
 //=======================================
@@ -299,12 +318,10 @@ detect_sid_address: {
 	iny
 	and (sidptr),y
 	cmp #$ff
-	bne !+
-	clc
-	rts
+	beq sidfound
 // Either PotX or PotY is not $ff - no SID or paddle is not fully left - try alternative detection
 // Reset SID (again)
-!:	ldy #24
+	ldy #24
 	lda #0
 !:	sta (sidptr),y
 	dey
@@ -316,9 +333,25 @@ detect_sid_address: {
 	bne !+
 	dex
 	bne !-
+sidfound:
 	clc
 	.byte BIT_ZP
 !:	sec
+	#if io_prtstatus
+		php
+		bit debug_mode
+		bpl !+
+		pha
+		jsr primm
+		.text @"?SID: \$00"
+		pla
+		jsr hexbout
+		jsr prtspace
+		tya
+		jsr hexbout
+	!:
+		plp
+	#endif
 	rts
 }
 
@@ -366,6 +399,17 @@ newsid:
 	.byte BIT_ZP
 oldsid:
 	sec
+	#if io_prtstatus
+		php
+		bit debug_mode
+		bpl !+
+		pha
+		jsr prtspace
+		pla
+		jsr hexbout
+	!:
+		plp
+	#endif
 	rts
 }
 
@@ -379,19 +423,54 @@ detect_nae: {
 	ldx #0
 !:	lda nae_control+15
 	cmp nae_control+15
-	bne !+
+	bne notfound
 	dex
 	bne !-
 	and #%11100000
 	cmp #%11100000
-	beq !+		// Legacy SID-Card
+	beq notfound	// Legacy SID-Card
 	lda nae_control+15
-	beq !+		// VICE :)
-	.byte BIT_ABS
-!:	lda #0
-	rts
+//	beq !+		// VICE :)
+	clc
+	.byte BIT_ZP
+notfound:
+	sec
+	#if io_prtstatus
+		php
+		bit debug_mode
+		bpl !+
+		pha
+		jsr prtspace
+		pla
+		pha
+		jsr hexbout
+		pla
+	!:	plp
+	#endif
+	bcc !+
+	lda #0
+!:	rts
 }
 #endif
 
+#if io_prtstatus
+	printaddr: {
+		pha
+//		lda #'@'
+//		jsr chrout
+		lda #'$'
+		jsr chrout
+		txa
+		jsr hexbout
+		pla
+		jsr hexbout
+		lda #':'
+		jsr chrout
+		jmp prtspace
+	}
+#endif
+
+}
+}
 }
 }

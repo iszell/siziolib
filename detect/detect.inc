@@ -3,6 +3,7 @@
 	.encoding "petscii_mixed"
 
 	.namespace iolib {
+	.namespace detect {
 detected_hardware:
 	.memblock "Detected hardware data"
 #if io_detect_sound
@@ -74,22 +75,22 @@ detected_hardware:
 .print ". Detected hardware data allocates " + detected_hardware_area_size + " bytes"
 
 .memblock "Hardware detection main code"
+#if io_prtstatus
+	debug_mode:
+		.byte 0
+#endif
 detect: {
 #if io_prtstatus
 	jsr primm
 	.text @"\$08\$0eDetecting hardware:\$0d\$00"
 #endif
-	ldx #detected_hardware_area_size-1
-	lda #0
-!:	sta detected_hardware,x
-	dex
-	bpl !-
+	jsr init
 
 #if io_detect_video
 	jsr detect_video_standard
 #endif
 #if io_detect_sound
-	jsr detect_sound
+	jsr detect_sound.detect_sound
 #endif
 #if io_detect_drive
 #endif
@@ -101,6 +102,37 @@ detect: {
 #if io_detect_emulator
 	jsr detect_emulator
 #endif
+	rts
+}
+
+init: {
+	ldx #detected_hardware_area_size-1
+	lda #0
+!:	sta detected_hardware,x
+	dex
+	bpl !-
+	#if io_prtstatus
+		ldx #0
+	!:	lda $0200,x
+		cmp #':'
+		beq colon
+		inx
+		cpx #32
+		bne !-
+		beq nodebug
+	colon:
+		inx
+		lda $0200,x
+		cmp #'d'
+		bne nodebug
+		jsr primm
+		.text @" !Debug mode enabled!\$0d\$00"
+		lda #-1
+		.byte BIT_ABS
+	#endif
+nodebug:
+	lda #0
+	sta debug_mode
 	rts
 }
 
@@ -124,8 +156,7 @@ detect: {
 			inx
 			dey
 			bne !-
-			lda #13
-			jsr chrout
+			jsr prtcr
 			#endif
 	#endif
 	rts
@@ -210,8 +241,7 @@ detect: {
 			#endif
 		cpuend:
 			#if io_prtstatus
-			lda #13
-			jsr chrout
+			jsr prtcr
 			#endif
 			pla
 			sta cpu_port
@@ -244,12 +274,24 @@ detect: {
 				sta ted.border
 				.byte $02
 			#endif
-			lda #13
-			jmp chrout
+			jmp prtcr
 		notvice:
 		#endif
 		rts
 	}
+#endif
+
+#if io_prtstatus
+prtspace: {
+	lda #' '
+	.byte BIT_ABS
+	// falls through to prtcr
+}
+
+prtcr: {
+	lda #13
+	jmp chrout
+}
 #endif
 
 #if io_detect_sound
@@ -258,4 +300,4 @@ detect: {
 //	#import "detect_drive.inc"
 //	#import "detect_memory.inc"
 }
-
+}

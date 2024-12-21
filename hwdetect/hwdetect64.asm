@@ -11,7 +11,7 @@ start:	jsr	primm
 	.text	"Hardware detect using IOLib by Siz"
 	.byte	14, 13, 0
 
-	jsr	iolib.detect
+	jsr	iolib.detect.detect
 	rts
 
 primm:	{
