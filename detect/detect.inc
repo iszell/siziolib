@@ -164,10 +164,10 @@ init: {
 		.text @"?Debug output enabled!\$0d\$00"
 		lda #-1
 		.byte BIT_ABS
+	nodebug:
+		lda #0
+		sta debug_mode
 	#endif
-nodebug:
-	lda #0
-	sta debug_mode
 	rts
 }
 
@@ -309,7 +309,9 @@ nodebug:
 				sta ted.border
 				.byte $02
 			#endif
-			jmp prtcr
+			#if io_prtstatus
+				jmp prtcr
+			#endif
 		notvice:
 		#endif
 		rts
