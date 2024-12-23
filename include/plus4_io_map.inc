@@ -110,6 +110,15 @@
 .label	fm_base		= $fde2
 .const	fm_reg_step	= $1
 
+// SoundX OPL-II/MIDI card
+// https://github.com/SukkoPera/SoundX/
+.label soundx_base	= $fde0
+.namespace soundx {
+	.label	address	= soundx_base+4
+	.label	data	= address + 1
+	.label	status	= address
+}
+
 .label	sid_csory	= $fe80
 
 

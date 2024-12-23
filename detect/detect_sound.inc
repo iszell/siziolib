@@ -228,25 +228,105 @@ readayreg:
 
 #if HAS_FM
 detect_fm: {
-	ldy	#4
+.label addressptr	= sidptr
+.label dataptr		= addressptr+2
+.label statusptr	= dataptr+2
+
+	#if HAS_TED
+		ldx #<(soundx.address)
+		lda #>(soundx.address)
+		stx addressptr
+		sta addressptr+1
+		ldx #<(soundx.data)
+		stx dataptr
+		sta dataptr+1
+		ldx #<(soundx.status)
+		stx statusptr
+		sta statusptr+1
+		jsr detect_opl
+		bcs !+
+		lda #3
+		sta fm_card_type
+		beq found
+	#endif
+!:	ldx #<(fm.address)
+	lda #>(fm.address)
+	stx addressptr
+	sta addressptr+1
+	ldx #<(fm.data)
+	stx dataptr
+	sta dataptr+1
+	ldx #<(fm.status)
+	stx statusptr
+	sta statusptr+1
+	jsr detect_opl
+	bcs notfound
+	#if HAS_TED
+		lda #2
+	#else
+		lda #1
+	#endif
+	sta fm_card_type
+
+found:
+	lda #1
+	sta fm_model
+	lda addressptr
+	ldx addressptr+1
+	sta fm_address
+	stx fm_address+1
+	#if io_prtstatus
+		jsr fmdebug
+		jsr primm
+		.text @"  FM  \$00"
+		lda fm_address
+		ldx fm_address+1
+		jsr printaddr
+		jsr primm
+		.text @"OPL/OPL-II, \$00"
+		ldx fm_card_type
+		dex
+		bne !+
+		jsr primm
+		.text @"Sound Expander\$00"
+		jmp foundend
+	!:	dex
+		bne !+
+		jsr primm
+		.text @"SideKick\$00"
+		jmp foundend
+	!:	jsr primm
+		.text @"SoundX\$00"
+foundend:
+		jsr prtcr
+	#endif
+	clc
+	.byte BIT_ZP
+notfound:
+	sec
+	rts
+
+detect_opl: {
+	ldy #0
+	ldx	#4
 	lda	#$60
 	jsr	writefmreg
 	lda	#$80
 	jsr	writefmreg
-	lda	fm.status
+	lda	(statusptr),y
 	and	#$e0
 	sta	fmstat1
-	ldy	#2
+	ldx	#2
 	lda	#$ff
 	jsr	writefmreg
-	ldy	#4
+	ldx	#4
 	lda	#$21
 	jsr	writefmreg
 	.for	(var i=0; i<72; i++) nop
-	lda	fm.status
+	lda	(statusptr),y
 	and	#$e0
 	sta	fmstat2
-	ldy	#4
+	ldx	#4
 	lda	#$60
 	jsr	writefmreg
 	lda	#$80
@@ -266,47 +346,37 @@ detect_fm: {
 	rts
 
 found:
-	lda #1
-	sta fm_model
-	lda #<fm_base
-	ldx #>fm_base+1
-	sta fm_address
-	stx fm_address+1
-	#if io_prtstatus
-		jsr fmdebug
-		jsr primm
-		.text @"  FM  \$00"
-		lda fm_address
-		ldx fm_address+1
-		jsr printaddr
-		jsr primm
-		.text @"OPL/OPL-II\$0d\$00"
-	#endif
 	clc
 	rts
+}
 
 //  3.3us after address  write: 6 NTSC double cycles
 // 35.0us after register write: 41 NTSC double cycles
-writefmreg:
-	sty	fm.address
+writefmreg: {
+	pha
+	txa
+	sta	(addressptr),y
 	.for	(var i=0; i<3; i++) nop
-	sta	fm.data
+	pla
+	sta	(dataptr),y
 	.for	(var i=0; i<21; i++) nop
 	rts
+}
 
 	#if io_prtstatus
-	fmdebug:
+	fmdebug: {
 		bit debug_mode
 		bpl !+
 		jsr primm
 		.text @"?FM: \$00"
-		lda fmstat1
+		lda detect_opl.fmstat1
 		jsr hexbout
 		jsr prtspace
-		lda fmstat2
+		lda detect_opl.fmstat2
 		jsr hexbout
 		jsr prtcr
 	!:	rts
+	}
 	#endif
 }
 #endif

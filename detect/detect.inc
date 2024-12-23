@@ -47,6 +47,11 @@ detected_hardware:
 #endif
 #if HAS_FM
 	// 0: none
+	// 1: Commodore Sound Expander
+	// 2: SideKick
+	// 3: SoundX
+	fm_card_type:
+	// 0: none
 	// 1: OPL/OPL-II
 	fm_model:
 		.byte 0
@@ -110,6 +115,7 @@ detect: {
 	jsr detect_sound.detect_sound
 #endif
 #if io_detect_drive
+	jsr detect_drive.detect
 #endif
 #if io_detect_cpu_port
 	jsr detect_cpu_port_type
@@ -328,6 +334,8 @@ prtcr: {
 #if io_detect_sound
 	#import "detect_sound.inc"
 #endif
-//	#import "detect_drive.inc"
+#if io_detect_drive
+	#import "detect_drive.inc"
+#endif
 }
 }

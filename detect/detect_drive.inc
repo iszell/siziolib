@@ -1,12 +1,15 @@
-	.print	". drive detection"
+	.memblock "Sound detection"
+	.print	". Drive detection"
 	.namespace iolib {
+	.namespace detect {
+	.namespace detect_drive {
 
-//#define DEBUG
+#define DEBUG
 //#define TEST_C16STM
 #undef HAS_BURST
 #undef HAS_IEEE
 
-detect_drive:
+detect:
 .namespace drivedetect {
 .label	io_ptr		= 2
 #if	HAS_TED
@@ -16,13 +19,6 @@ detect_drive:
 #endif
 .const	lastdrive	= 15
 io_det_drive:
-#if	HAS_TED
-	#import "plus4_io_map.inc"
-#if DEBUG
-	lda ted.border
-	pha
-#endif
-#endif
 	lda #0
 	sta nodefaultdrive
 	sta c16stmdevice
@@ -36,23 +32,17 @@ io_det_drive:
 	sta	io_drivetyp
 	sta	io_driveiftyp
 	sta	io_drivesernum
-	#if	prtstatus
+	#if	io_prtstatus
 	jsr	primm
 	.text	@" Detected devices:\$0d\$00"
 	#endif
-	jsr	io_detectdrvtp	
-	#if	prtstatus
+	jsr	io_detectdrvtp
+	#if	io_prtstatus
 	jsr	primm
 	.text	@" Using drive #\$00"
 	jsr	io_prtdrivenum
 	jsr	prtcr
 	#endif
-#if	HAS_TED
-#if DEBUG
-	pla
-	sta ted.border
-#endif
-#endif
 	rts
 	
 io_detectdrvtp:
@@ -62,7 +52,7 @@ io_detectdrvtp:
 	ldx	#4
 io_detnextdrvtp:
 	stx	currdrive
-	#if prtstatus
+	#if io_prtstatus
 	jsr	primm
 	.text	@"  #\$00"
 	jsr	io_prtdrivenum
@@ -89,7 +79,7 @@ forcestatus:
 !:
 	#endif
 	jsr	io_detdrvif
-	#if	prtstatus
+	#if	io_prtstatus
 // Print detected drive and interface type
 	lda	io_drivetyp
 	cmp	#$ff
@@ -97,7 +87,7 @@ forcestatus:
 	jmp	io_detdrvnotpresent
 !:	lda	#':'
 	jsr	chrout
-	jsr	prtspc
+	jsr	prtspace
 	lda	io_drivetyp
 	asl
 	asl
@@ -112,7 +102,7 @@ forcestatus:
 	inx
 	dey
 	bne	!-
-!:	jsr	prtspc
+!:	jsr	prtspace
 	lda	io_driveiftyp
 	asl
 	asl
@@ -146,7 +136,7 @@ forcestatus:
 	lda statustxt
 	beq io_detdrvnotpresent
 	ldx #6
-!:	jsr prtspc
+!:	jsr prtspace
 	dex
 	bpl	!-
 	ldx #3
@@ -161,7 +151,7 @@ forcestatus:
 	#endif	
 // Device number not responding. Try next one
 io_detdrvnotpresent:
-	#if prtstatus
+	#if io_prtstatus
 	lda	io_drivetyp
 	cmp	#$ff
 	bne !+
@@ -212,7 +202,7 @@ io_detdrvnotpresent:
 	beq !+
 	jmp	io_detnextdrvtp
 !:
-	#if	prtstatus
+	#if	io_prtstatus
 	jsr	primm
 	.text	@" Devices connected to serial bus: \$00"
 	lda	io_drivesernum
@@ -778,7 +768,7 @@ sendbyte:
 }	
 #endif
 
-	#if	prtstatus
+	#if	io_prtstatus
 io_prtdrivenum:
 	ldx	#0
 	lda	currdrive
@@ -915,6 +905,8 @@ iftable:
 	.byte 12,1//FD-2000,serial
 iftblend:
 
+io_tcbmoffs:
+	.byte 0
 nodefaultdrive:
 	.byte	0
 c16stmdevice:
@@ -939,5 +931,7 @@ statuslen:
 statustxt:
 	.fill	64, 0
 statustxte:
+}
+}
 }
 }
