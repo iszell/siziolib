@@ -52,12 +52,12 @@ print:
 }
 
 	#define io_prtstatus
-	#define io_detect_video
-	#define io_detect_memory_size
+//	#define io_detect_video
+//	#define io_detect_memory_size
 	#define io_detect_sound
 	#define io_detect_drive
-	#define io_detect_emulator
+//	#define io_detect_emulator
 //	#define io_halt_on_vice
-	#define io_detect_cpu_port
+//	#define io_detect_cpu_port
 
 	#import "../detect/detect.inc"

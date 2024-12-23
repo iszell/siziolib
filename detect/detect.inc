@@ -51,6 +51,7 @@ detected_hardware:
 	// 2: SideKick
 	// 3: SoundX
 	fm_card_type:
+		.byte 0
 	// 0: none
 	// 1: OPL/OPL-II
 	fm_model:
