@@ -125,27 +125,31 @@ detect: {
 	jsr detect_emulator
 #endif
 #if io_prtstatus
-	bit debug_mode
-	bmi !+
-	rts
-	ldx #0
-!:	lda detected_hardware,x
-	jsr hexbout
-	jsr prtspace
-	jsr prtspace
-	inx
-	cpx #detected_hardware_area_size
-	bne !-
+	.if(detected_hardware_area_size > 0) {
+		bit debug_mode
+		bmi !+
+		rts
+	!:	ldx #0
+	!:	lda detected_hardware,x
+		jsr hexbout
+		jsr prtspace
+		jsr prtspace
+		inx
+		cpx #detected_hardware_area_size
+		bne !-
+	}
 #endif
 	rts
 }
 
 init: {
-	ldx #detected_hardware_area_size-1
-	lda #0
-!:	sta detected_hardware,x
-	dex
-	bpl !-
+	.if( detected_hardware_area_size > 0 ) {
+		ldx #detected_hardware_area_size-1
+		lda #0
+	!:	sta detected_hardware,x
+		dex
+		bpl !-
+	}
 	#if io_prtstatus
 		ldx #0
 	!:	lda $0200,x
