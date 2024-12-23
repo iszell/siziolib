@@ -21,5 +21,6 @@
 	#define io_detect_emulator
 //	#define io_halt_on_vice
 	#define io_detect_cpu_port
+//	#define io_halt_on_6502
 
 	#import "../detect/detect.inc"
