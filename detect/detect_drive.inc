@@ -1,12 +1,11 @@
+	#import "iolib_def.inc"
+
 	.memblock "Drive detection"
 	.print	". Drive detection"
 	.namespace iolib {
 	.namespace detect {
 	.namespace detect_drive {
-
-	.enum { UNKNOWN, C1540, C1541, C1541C, C1541II, C1551, C1570, C1571, C1581, RF501C, SD2IEC, FLEXSD, FD2000, C16STM, YAPEIEC, TCBM2SD }
-	.enum { UNSUPPORTED, SERIAL, TCBM, PARALLEL, TCBMSTANDARD, IEEE488, SERIALBURST, EXPANSIONPORT }
-
+	
 //#define TEST_C16STM
 #undef HAS_BURST
 #undef HAS_IEEE

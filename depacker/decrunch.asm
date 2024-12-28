@@ -4,58 +4,27 @@
 	#import "iolib_def.inc"
 	*= decrunch
 {
-
-	tya
-	pha
-	txa
-	pha
-	jsr io_hardsync
-	jsr io_writebyte
-	pla
-	jsr io_writebyte
-	pla
-	jsr io_writebyte
-	jsr io_sync
-	jsr getcmem	// Ignore first two bytes of file
-	jsr getcmem
+	jsr load
+	bcs !+
 	jsr dodecrunch
-	jsr getcmem	// read EOF marker
 	clc
-	rts
+!:	rts
 
 getcmem:
 	php
 	stx xtemp
 	sty ytemp
-!:	jsr io_readbyte
-	cmp #$ac
+	ldy #0
+	lda (io_loadptr),y
+	inc io_loadptr
 	bne !+
-	jsr io_readbyte
-	cmp #$ac
-	beq !+
-	cmp #$ff
-	beq eof
-	cmp #$f7
-	beq lderror
-	jsr io_sync
-	jmp !-
+	inc io_loadptr+1
 !:
 .label	xtemp	= * + 1
 	ldx #0
 .label	ytemp	= * + 1
 	ldy #0
 	plp
-	rts
-lderror:
-	pla
-	pla
-	pla
-	pla
-	pla
-	sec
-	.byte $24	// bit $xx
-eof:	pla
-	clc
 	rts
 	#import	"exodecrunch.inc"
 dodecrunch:

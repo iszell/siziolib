@@ -1,6 +1,7 @@
+	#define STRIPPEDTEST
 	#import "stripped.asm"
 	
-	* = $5555
+	* = $5555 "Stripped loader test"
 	
 	dec $ff19
 	lda #0

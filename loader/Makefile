@@ -10,7 +10,7 @@ clean:
 	$(EXOMIZER) $(EXOMIZERSFXOPTS) -o $@ $(basename $@).tmp
 
 init.prg: init.asm
-	$(KICKASS) $(KICKASSOPTS) -define prtstatus -o init.tmp init.asm
+	$(KICKASS) $(KICKASSOPTS) -define io_prtstatus -define io_detect_video -define io_detect_memory_size -define io_detect_sound -define io_detect_emulator -o init.tmp init.asm
 	$(EXOMIZER) $(EXOMIZERSFXOPTS) -o $@ init.tmp
 
 initquiet.prg: init.asm
@@ -24,5 +24,5 @@ hwdetect64.prg: hwdetect64.asm
 stripped.prg: stripped.asm
 	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<
 
-strippedtest.prg: stripped.asm
+strippedtest.prg: strippedtest.asm stripped.asm
 	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<

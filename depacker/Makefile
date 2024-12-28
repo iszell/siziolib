@@ -1,6 +1,7 @@
 include ../defaults.mk
 
-all: decrunch.prg decrunch_c16stm.prg
+all: decrunch.prg 
+# decrunch_c16stm.prg
 
 clean:
 	$(CLEANCMD)

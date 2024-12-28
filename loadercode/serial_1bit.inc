@@ -4,7 +4,7 @@
 	#import "iolib_def.inc"
 	#import "ted.inc"
 
-	*= io_base
+	.pseudopc io_base
 {
 
 .label bitbuff	= iolib.io_bitbuff
@@ -32,10 +32,6 @@
 .label	serialport	= cpu_port
 
 	jmp	startload
-	jmp	readbyte
-	jmp	writebyte
-	jmp	hardsync
-	jmp	sync
 	lda	#%00001000	// 11000111
 	sta	serialport
 	ldx	#0

@@ -1,47 +1,19 @@
+	.print	". plus/4 C16STM loader"
 	.namespace iolib {
 	.namespace plus4c16stm {
 	
 	#import "iolib_def.inc"
 	#import "ted.inc"
-	*= io_base
+	.pseudopc io_base
 {
-	
 
 #if TEST_C16STM
 .print "!!! TEST BUILD !!!"
 #endif
 
 	jmp	startload
-	jmp	readbyte
-	jmp	writebyte
-	jmp	hardsync
-	jmp	sync
 hardsync:
 sync:
-	rts
-
-readbyte:
-#if	need_exodecrunch
-	ldy #0
-	lda (iolib.io_loadptr),y
-	inc	iolib.io_loadptr
-	bne !+
-	inc	iolib.io_loadptr+1
-!:	clc
-#endif
-	rts
-
-writebyte:
-#if	need_exodecrunch
-	ldx	filenameptr
-	sta filename,x
-	inx
-	cpx #2
-	bne !+
-	ldx #0
-!:	stx	filenameptr
-	beq	startload2
-#endif
 	rts
 
 startload:

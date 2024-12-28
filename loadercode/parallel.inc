@@ -1,9 +1,10 @@
+	.print	". plus/4 parallel loader"
 	.namespace iolib {
 	.namespace plus4parallel {
 	#import "iolib_def.inc"
 	#import "ted.inc"
 
-	*= io_base
+	.pseudopc io_base
 {
 
 // default value %11001000
@@ -19,10 +20,6 @@
 .label	serialdata = cpu_port
 
 	jmp	startload
-	jmp	readbyte
-	jmp	writebyte
-	jmp	hardsync
-	jmp	sync
 init:	lda #%11111111
 	sta pio_parport
 	lda #%00001010	// Casette motor OFF// CLK=LOW

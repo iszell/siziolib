@@ -20,17 +20,21 @@
 	jsr readbyte
 #if need_loadflag
 	bit iolib.io_loadflag
-	bmi !+
+	bpl !+
+	lda ptr
+!:
 #endif
 	sta ptr
-!:
+	pha
 	jsr readbyte
 #if need_loadflag
 	bit iolib.io_loadflag
-	bmi !+
+	bpl !+
+	lda ptr+1
+!:
 #endif
 	sta ptr+1
-!:
+	pha
 	cmp #$fe
 	bne !+
 	jsr readbyte
@@ -59,6 +63,10 @@ storebyte:
 eof:
 	clc
 loaderror:
+	pla
+	sta ptr+1
+	pla
+	sta ptr
 	ldx filename
 	ldy filename+1
 	rts

@@ -1,5 +1,4 @@
 SUBDIRS := 	drivecode \
-			loadercode \
 			depacker \
 			loader \
 			demo \
@@ -24,7 +23,7 @@ clean: $(SUBDIRS)
 testdisk.d64 testdisk.d71 testdisk.d81: $(SUBDIRS)
 	$(RM) $@
 	$(CC1541) \
-		-n "iolibv3test" \
+		-n "iolibv4test" \
 		-f demo -w demo/demo.prg \
 		-f iolibv3test -w demo/iolibv3test.prg \
 		-f iolibv3exotest -w demo/iolibv3exotest.prg \

@@ -1,10 +1,10 @@
-	.print	". plus/4 TCBM loader"
+	.print	". plus/4 TCBM standard loader"
 	.namespace iolib {
 	.namespace plus4tcbm_standard {
 	#import "iolib_def.inc"
 	#import "ted.inc"
 
-	*= io_base
+	.pseudopc io_base
 {
 
 .label	tia	= tcbm_9
@@ -16,10 +16,6 @@
 .label	pcdir	= tia+5
 
 	jmp	startload
-	jmp	readbyte
-	jmp	writebyte
-	jmp	hardsync
-	jmp	sync
 init:
 hardsync:
 sync:	rts

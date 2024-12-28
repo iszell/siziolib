@@ -11,11 +11,11 @@
 	.text	"(c) 2016.04.02"
 	.byte	14, 13, 0
 
-	jsr	iolib.detect
-	lda	iolib.drivedetect.io_drivetyp
-	bne	!+
+	jsr	iolib.detect.detect
+	jsr	iolib.loader.init
+	bcc !+
 	rts
-!:	jsr	iolib.init
+!:
 	jsr	primm
 	.byte	13
 	.text	"Testing loader: "
@@ -74,12 +74,24 @@ irq:	inc	ted.border
 	dec	ted.border
 	rti
 
-.namespace iolib {
-	#define	prtstatus
-	#define need_video_detect
-	#define need_memory_detect
-	#define need_sound_detect
+	#define io_prtstatus
+// Detect video standard. Not really useful except for printing status message
+	#define io_detect_video
+// Detect memory size and expansion type
+	#define io_detect_memory_size
+// Detect available sound expansions including SID type and address
+	#define io_detect_sound
+	#define io_detect_drive
+// Detect VICE xplus4 and optionally halt when detected
+//	#define io_detect_emulator
+//	#define io_halt_on_vice
+// Detect CPU to get rid of 6502to7501 adapters
+	#define io_detect_cpu_port
+	#define io_halt_on_6502
+
+// Include loader code (drive detection and loader)
 	#define need_loader
+// Include exomizer on-the-fly decruncher
 	#define need_exodecrunch
-}
-#import "../core/iolib.inc"
+
+	#import "../core/iolib.inc"

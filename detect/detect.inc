@@ -1,4 +1,4 @@
-//	#import "iolib_def.inc"
+	#importonce
 	.print	"Siz IOLib hardware detection code"
 	.encoding "petscii_mixed"
 

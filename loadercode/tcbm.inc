@@ -3,7 +3,7 @@
 	.namespace plus4tcbm {
 	#import "ted.inc"
 
-	*= io_base
+	.pseudopc io_base
 {
 
 .label	tia	= tcbm_9
@@ -15,10 +15,6 @@
 .label	pcdir	= tia+5
 
 	jmp	startload
-	jmp	readbyte
-	jmp	writebyte
-	jmp	hardsync
-	jmp	sync
 	ldx	io_tcbmoffs
 	lda pcdta,x
 	and #%10111111
