@@ -302,7 +302,7 @@ io_driveloaders:
 	.word	io_drvtcbm, io_drvgijoe
 	.word	io_drvgijoe, io_loaderend
 
-	.memblock "plus/4 side loader code"
+	.memblock "plus/4 side loader codes"
 io_plus4serial1bit:
 	#import "../loadercode/serial_1bit.inc"
 io_plus4parallel:
@@ -314,7 +314,7 @@ io_plus4tcbm_standard:
 io_plus4c16stm:
 	#import "../loadercode/c16stm.inc"
 
-	.memblock "drive side loader code"
+	.memblock "Drive side loader codes"
 io_drv1541ser1:
 	.import c64 "../drivecode/serial_1bit_1541.prg"
 io_drv1581ser1:

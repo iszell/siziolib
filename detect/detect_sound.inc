@@ -1,3 +1,6 @@
+	.memblock "Sound detection"
+	.print	". Sound source detection"
+
 #if HAS_AY
 	#import	"ay.inc"
 #endif
@@ -5,8 +8,6 @@
 	#import	"fm.inc"
 #endif
 
-	.memblock "Sound detection"
-	.print	". Sound source detection"
 	.namespace iolib {
 	.namespace detect {
 	.namespace detect_sound {
