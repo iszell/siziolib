@@ -265,8 +265,8 @@ io_loadertab:
 	.byte	SD2IEC,		SERIAL,			CL_SERIAL_1_BIT,	DL_GIJOE
 	.byte	FLEXSD,		SERIAL,			CL_SERIAL_1_BIT,	DL_GIJOE
 	.byte	C16STM,		EXPANSIONPORT,	CL_C16STM,			DL_NA
-//	.byte	YAPEIEC,	TCBM,			CL_TCBM_STANDARD,	DL_NA
-//	.byte	TCBM2SD,	TCBM,			CL_TCBM_STANDARD,	DL_NA
+	.byte	YAPEIEC,	TCBM,			CL_TCBM_STANDARD,	DL_NA
+	.byte	TCBM2SD,	TCBM,			CL_TCBM_STANDARD,	DL_NA
 	.byte	0
 
 	#if	io_prtstatus
@@ -309,10 +309,10 @@ io_plus4parallel:
 	#import "../loadercode/parallel.inc"
 io_plus4tcbm:
 	#import	"../loadercode/tcbm.inc"
-io_plus4tcbm_standard:
-	#import "../loadercode/tcbm_standard.inc"
 io_plus4c16stm:
 	#import "../loadercode/c16stm.inc"
+io_plus4tcbm_standard:
+	#import "../loadercode/tcbm_standard.inc"
 
 	.memblock "Drive side loader codes"
 io_drv1541ser1:

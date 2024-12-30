@@ -335,7 +335,7 @@ detflexsd: {
 	lda	statustxt
 	cmp	#'3'
 	beq	!+
-	ldy	#11
+	ldy	#FLEXSD
 	sty	io_drivetyp
 	clc
 	.byte BIT_ZP
@@ -572,8 +572,6 @@ nottcbm:
 		bcs io_detdrvcurriffail
 	#endif
 io_notpar:
-	cmp #TCBMSTANDARD
-	beq end // always detected
 	cmp #EXPANSIONPORT
 	bne	io_notexpansionport
 	beq end // always detected
@@ -797,11 +795,11 @@ io_drvaddre:
 io_drivestsstr:
 	       //0123456
 	.text	@"sd2iec\$00"
-	.byte	10
+	.byte	SD2IEC
 	.text	@"yape\$00\$00\$00"
-	.byte	14
+	.byte	YAPEIEC
 	.text	@"tcbm2sd"
-	.byte	15
+	.byte	TCBM2SD
 //	.text	"tdisk"
 //	.byte	0, 0, 10 // SD2IEC test
 io_drivestsstre:
@@ -811,8 +809,8 @@ io_drivestsstre:
 iftable:
 #if HAS_TED
 	.byte C16STM, EXPANSIONPORT
-	.byte YAPEIEC, TCBMSTANDARD
-	.byte TCBM2SD, TCBMSTANDARD
+	.byte YAPEIEC, TCBM
+	.byte TCBM2SD, TCBM
 #endif
 //	.byte 0,3 //unknown,TCBM
 	.byte UNSUPPORTED, UNKNOWN

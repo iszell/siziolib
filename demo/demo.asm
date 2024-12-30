@@ -9,7 +9,7 @@
 .label	bmp	=	$2000
 
 	jsr	primm
-	.text	"IOLibV3 demo by Siz (c) 2017.05.10"
+	.text	"IOLib demo by Siz (c) 2017.05.10"
 	.byte	14, 13, 0
 	
 	jsr	iolib.detect.detect
