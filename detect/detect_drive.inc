@@ -1,4 +1,4 @@
-	#import "iolib_def.inc"
+	#import "../include/iolib_def.inc"
 
 	.memblock "Drive detection"
 	.print	". Drive detection"
