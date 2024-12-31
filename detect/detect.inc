@@ -269,15 +269,6 @@ init: {
 			lda #2
 			sta cpu_port_type
 		incompatbile:
-			#if io_halt_on_6502
-				#if io_prtstatus
-					jsr	primm
-					.text	@". Incompatible, stopping\$00"
-				#endif
-				lda #$77
-				sta ted.border
-				.byte $02
-			#endif
 		cpuend:
 			#if io_prtstatus
 			jsr prtcr

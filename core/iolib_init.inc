@@ -12,6 +12,22 @@ init:
 
 #if	need_loader
 	.print	". loader init"
+	lda iolib.detect.drive_interface_type
+	cmp #SERIAL
+	bne notserial
+	lda iolib.detect.cpu_port_type
+	beq notserial
+	#if io_halt_on_6502
+		#if io_prtstatus
+			jsr	primm
+			.text	@". Incompatible, stopping\$00"
+		#endif
+		lda #$77
+		sta ted.border
+		.byte $02
+	#endif
+
+notserial:
 	ldx #0
 !:	lda	io_loadertab,x
 	beq noloader
