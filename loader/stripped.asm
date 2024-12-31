@@ -17,14 +17,15 @@ quit:
 	jmp $5555
 #endif
 
-.namespace iolib {
-	.label	io_tcbmoffs	= $06ff
-	.label	io_base		= $0700
-	.label  io_bitbuff	= $b7
-	.label  io_loadptr  = $9e
-	.label  io_loadflag = $9d
-}
-#define skip_default_definitions
+	// Custom memory locations
+	#define io_skip_default_definitions
+	.namespace iolib {
+		.label	io_base		= $0700
+		.label	io_tcbmoffs	= io_base - 1
+		.label  io_bitbuff	= $b7
+		.label  io_loadptr  = $9e
+		.label  io_loadflag = $9d
+	}
 //	#define io_prtstatus
 // Detect video standard. Not really useful except for printing status message
 //	#define io_detect_video

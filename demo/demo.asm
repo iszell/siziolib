@@ -5,7 +5,7 @@
 
 	.encoding	"petscii_mixed"
 
-.label	charset	=	$4000
+.label	charset	=	$d400
 .label	bmp	=	$2000
 
 	jsr	primm
@@ -35,15 +35,6 @@
 	inx
 	beq	!-
 
-	ldx	#0
-!:
-	.for	(var i=0; i<4; i=i+1) {
-	lda	$d400+i*$100,x
-	sta	charset+i*$100,x
-	}
-	inx
-	bne	!-
-
 	lda	#0
 	sta	loopcnt
 	sta	loopcnt+1
@@ -53,11 +44,11 @@
 	sta	jiffy
 
 	sei
-	sta	ted.ramen
+	sta	ted.romen
 	lda	#<irq
 	ldx	#>irq
-	sta	$fffe
-	stx	$ffff
+	sta	$0314
+	stx	$0315
 	lda	#2
 	sta	ted.rasterirqline
 	cli
@@ -128,28 +119,22 @@ quit:
 	
 clr:	ldx	#0
 	lda	#$00
-!:	.for	(var i=0; i<32; i=i+1) {
-	sta	$2000+$100*i,x
+!:	.for	(var i=0; i<31; i=i+1) {
+		sta	bmp+$100*i,x
 	}
+	sta	bmp+$1e40,x
 	inx
 	bne	!-
 	rts
 
-irq:	pha
-	txa
-	pha
-	tya
-	pha
-
-.label	bordercolor = *+1
-	lda	#$71
+irq:
+	lda	bordercolor: #$71
 	ldx	#160
 !:	cpx	ted.rastercolumn
 	bcs	!-
 	sta	ted.border
 
-.label	irqline	= *+1
-	lda	#203
+	lda	irqline: #203
 	sta	ted.rasterirqline
 	
 	lda	bordercolor
@@ -289,9 +274,9 @@ prtstr:
 !:	cpx	#5
 	bne	!--
 
-	lda	#0
+	lda	#<(bmp+24*320)
 	sta	prtchar.dstaddr
-	lda	#(>bmp+24*320)
+	lda	#>(bmp+24*320)
 	sta	prtchar.dstaddr+1
 	ldx	#0
 !:	lda	string,x
@@ -302,12 +287,11 @@ prtstr:
 !:	and	#$7f
 !:	jsr	prtchar
 	inx
-	cpx	#32
+	cpx	#40
 	bne	!---
 	rts
 
-prtchar:
-	{
+prtchar: {
 	sta	savea
 	stx	savex
 	lda	#0
@@ -324,10 +308,8 @@ prtchar:
 	ora	#>charset
 	sta	srcaddr+1
 	ldx	#7
-.label	srcaddr=*+1
-!:	lda	charset,x
-.label	dstaddr=*+1
-	sta	bmp+24*320,x
+!:	lda	srcaddr: charset,x
+	sta	dstaddr: bmp+24*320,x
 	dex
 	bpl	!-
 	lda	#8
@@ -337,10 +319,8 @@ prtchar:
 	bcc	!+
 	inc	dstaddr+1
 !:
-.label	savex=*+1
-	ldx	#0
-.label	savea=*+1
-	lda	#0
+	ldx	savex: #0
+	lda	savea: #0
 	}
 	rts
 
@@ -370,6 +350,17 @@ runmin:
 runsec:
 	.text	"00"
 	.fill	32, ' '
+
+	#define io_skip_default_definitions
+	.namespace iolib {
+		.label	io_base		= $1700
+		.label	io_tcbmoffs	= io_base - 1
+		.label  io_bitbuff	= $b7
+		.label  io_loadptr  = $9e
+		.label  io_loadflag = $9d
+	}
+	#define io_predefined_decrunch_table
+	.label	decrunch_table = $1500
 
 	#define io_prtstatus
 // Detect video standard. Not really useful except for printing status message

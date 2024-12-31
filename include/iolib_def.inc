@@ -6,8 +6,7 @@
 .enum { UNSUPPORTED, SERIAL, TCBM, PARALLEL, IEEE488, SERIALBURST, EXPANSIONPORT }
 
 // IOLib definitions to be included in programs where you use it
-#if skip_default_definitions
-#else
+#if !io_skip_default_definitions
 	#if HAS_TED
 	.label	io_base		= $fc00
 	#else
@@ -23,7 +22,7 @@
 .label	load			= io_base
 .label	io_initloader	= io_base + 3
 
-#if !skip_default_definitions
+#if !io_skip_default_definitions
 	// bit buffer for serial shift operations
 	.label  io_bitbuff	= $b7
 	// load pointer

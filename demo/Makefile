@@ -9,6 +9,10 @@ clean:
 	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $(basename $@).tmp $<
 	$(EXOMIZER) $(EXOMIZERSFXOPTS) -o $@ $(basename $@).tmp
 
+demo.prg: demo.asm
+	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $(basename $@).tmp $<
+	$(EXOMIZER) sfx basic -t 16 -n -s "lda 174 pha" -f "pla sta 174" -o $@ $(basename $@).tmp
+
 bitmapexodata.prg: bitmap1.bin
 	$(EXOMIZER) $(EXOMIZERMEMOPTS) -o $@ $<
 

@@ -125,7 +125,9 @@
 .const	encoded_entries = 52
 #endif
 
-.label	decrunch_table = $ff40
+#if !io_predefined_decrunch_table
+	.label	decrunch_table = $ff40
+#endif
 
 .label	tabl_bi = decrunch_table
 .label	tabl_lo = decrunch_table + encoded_entries

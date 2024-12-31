@@ -1,5 +1,4 @@
 SUBDIRS := 	drivecode \
-			depacker \
 			loader \
 			demo \
 			hwdetect

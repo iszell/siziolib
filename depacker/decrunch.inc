@@ -2,7 +2,7 @@
 	.namespace iolibdecrunch {
 	#import "ted.inc"
 	#import "iolib_def.inc"
-	*= decrunch
+	.pseudopc decrunch
 {
 	jsr load
 	bcs !+

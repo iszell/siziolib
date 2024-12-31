@@ -346,7 +346,7 @@ io_loaderend:
 #if need_exodecrunch
 	.memblock "Exompizer decruncher"
 	io_decrunchdata:
-		.import c64 "../depacker/decrunch.prg"
+		#import "../depacker/decrunch.inc"
 	.label io_decrunchdatasize=*-io_decrunchdata
 #endif
 }
