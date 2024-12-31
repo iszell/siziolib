@@ -14,6 +14,7 @@ $(SUBDIRS):
 
 clean: $(SUBDIRS)
 	$(CLEANCMD)
+	rm -rf sd2iec/*
 
 %.prg: %.asm
 	$(KICKASS) $(KICKASSOPTS) -o $(basename $@).tmp $<
