@@ -4,13 +4,19 @@
 	#import "iolib_def.inc"
 	.pseudopc decrunch
 {
+{
+	stx xtemp
+	sty ytemp
 	jsr load
 	bcs !+
 	jsr dodecrunch
 	clc
-!:	rts
+!:	ldx xtemp: #0
+	ldy ytemp: #0
+	rts
+}
 
-getcmem:
+getcmem: {
 	php
 	stx xtemp
 	sty ytemp
@@ -19,13 +25,11 @@ getcmem:
 	inc io_loadptr
 	bne !+
 	inc io_loadptr+1
-!:
-.label	xtemp	= * + 1
-	ldx #0
-.label	ytemp	= * + 1
-	ldy #0
+!:	ldx xtemp: #0
+	ldy ytemp: #0
 	plp
 	rts
+}
 	#import	"exodecrunch.inc"
 dodecrunch:
 	exodecrunch(getcmem)

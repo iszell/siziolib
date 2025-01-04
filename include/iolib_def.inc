@@ -16,7 +16,7 @@
 #endif
 // Compress data to be loaded with "exomizer mem -f" command
 // parameters: X: file name first byte, Y: file name second byte
-.label	decrunch		= io_base - $150
+.label	decrunch		= io_base - $160
 
 // parameters: X: file name first byte, Y: file name second byte
 .label	load			= io_base

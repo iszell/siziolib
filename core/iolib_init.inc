@@ -344,7 +344,7 @@ io_drvgijoe:
 io_loaderend:
 #endif
 #if need_exodecrunch
-	.memblock "Exompizer decruncher"
+	.memblock "Exomizer decruncher"
 	io_decrunchdata:
 		#import "../depacker/decrunch.inc"
 	.label io_decrunchdatasize=*-io_decrunchdata
