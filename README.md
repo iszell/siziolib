@@ -78,6 +78,10 @@ Drive types detected:
 - Commodore 1581
 - RF501C
 - SD2IEC
+- SD2IEC with VCPU extension (FlexSD)
+- Jocó's SD drive (C16STM)
+- TCBM2SD by ytm
+- YaPE 1551 IEC protocol emulation
 
 After the drive type is identified it will detected the interface used to
 connect the drive to the computer in the following order
