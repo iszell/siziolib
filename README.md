@@ -154,3 +154,10 @@ $fab0-$fbf9 | Exomizer decruncher resident part
 $fbff-$fbff | Work area
 $fc00-$fcff | Loader resident part
 $ff40-$ffdc | Exomizer decruncher work area. Will be overwritten during Exomizer load.
+
+# To Do
+* It seems sometimes a phantom SID card is detected
+* Implement computer side serial protocol for 6510to7501 adapters
+* Implement TCBM2SD fast load protocol
+* Implement 2 bit serial protocol for single serial drives
+* Implement track loading capability for physical disk drives
