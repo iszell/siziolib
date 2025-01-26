@@ -273,7 +273,7 @@ foundtyp:
 // Read drive memory
 //=======================================
 readmem: {
-	DEBUGCHAR('r')
+	DEBUGCHAR('m')
 	stx	xtmp
 	lda	#15
 	ldx	currdrive
@@ -365,6 +365,7 @@ io_detbysts: {
 	lda statustxt
 	cmp #'7'
 	beq !+
+	DEBUGCHAR('j')
 	ldx #'u'		// workaround for YaPE IEC which does not support UI
 	ldy #'j'
 	jsr	readstatus
