@@ -1,5 +1,4 @@
 # siziolib: Siz's I/O library v4
-[[_TOC_]]
 
 # # 1. Introduction
 The IOLib is a modular hardware detection and IRq loader framework for the
