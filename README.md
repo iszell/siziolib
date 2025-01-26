@@ -1,6 +1,7 @@
 # siziolib: Siz's I/O library v4
+[[_TOC_]]
 
-# 1. Introduction
+# # 1. Introduction
 The IOLib is a modular hardware detection and IRq loader framework for the
 Commodore 264 series of computers.
 Main goal of development was to create a totally asynchronous loader system
