@@ -246,7 +246,6 @@ init: {
 			jmp cpuend
 		not7501:
 			and #%11000000
-			eor #%11000000
 			bne not6502
 			lda cpu_port
 			and #~%00000011
@@ -256,7 +255,7 @@ init: {
 			beq not6502
 			#if io_prtstatus
 				jsr	primm
-				.text	@"6502/8500\$00"
+				.text	@"6510/8500\$00"
 			#endif
 			lda #1
 			sta cpu_port_type
@@ -316,8 +315,7 @@ init: {
 #if io_prtstatus
 prtspace: {
 	lda #' '
-	.byte BIT_ABS
-	// falls through to prtcr
+	jmp chrout
 }
 
 prtcr: {
