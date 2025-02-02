@@ -156,6 +156,7 @@ $fc00-$fcff | Loader resident part
 $ff40-$ffdc | Exomizer decruncher work area. Will be overwritten during Exomizer load.
 
 # 5. To Do
+* Rewrite detected device names output so more than 16 devices can be displayed; currently printer is incorrectly shown as unknown
 * It seems sometimes a phantom SID card is detected
 * Implement computer side serial protocol for 6510to7501 adapters
 * Implement TCBM2SD fast load protocol

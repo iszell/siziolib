@@ -62,6 +62,8 @@ io_detnextdrvtp:
 	jsr	io_detcurrdrv
 	cpy #C1551
 	beq forcestatus
+	cpy	#PRINTER
+	beq	printer
 	cpy	#UNKNOWN
 	bne	!+
 // Detection by ROM read failed. Try FlexSD
@@ -81,6 +83,7 @@ forcestatus:
 	!:
 	#endif
 	jsr	io_detdrvif
+printer:
 	#if	io_prtstatus
 	// Print detected drive and interface type
 		lda	io_drivetyp
@@ -264,6 +267,9 @@ donext:
 	bne	nextchk
 	
 notexist:
+	jsr opentest
+	ldy #PRINTER
+	bcc foundtyp
 	ldy	#$ff
 foundtyp:
 	sty	io_drivetyp
@@ -287,6 +293,15 @@ readmem: {
 	DEBUGCHAR('n')
 	jsr	open
 	DEBUGCHAR('o')
+	#if io_prtstatus
+	{
+		bit debug_mode
+		bpl nodebug
+		lda st
+		jsr hexbout
+	nodebug:
+	}
+	#endif
 	lda	st
 	bne	!+
 	ldx	#15
@@ -316,6 +331,60 @@ readmem: {
 	jsr	clrchans
 	DEBUGCHAR('c')
 	lda	#15
+	jsr	close
+	DEBUGCHAR('-')
+	plp
+	ldx	xtmp
+	rts
+}
+
+// Test if device can be opened for printer detection
+//===================================================
+opentest: {
+	DEBUGCHAR('O')
+	stx	xtmp
+	lda	#1
+	ldx	currdrive
+	ldy #0
+	jsr	setlfs
+	DEBUGCHAR('l')
+	lda	#0
+	jsr	setnam
+	DEBUGCHAR('n')
+	jsr	open
+	DEBUGCHAR('o')
+	#if io_prtstatus
+	{
+		bit debug_mode
+		bpl nodebug
+		lda st
+		jsr hexbout
+	nodebug:
+	}
+	#endif
+	lda	st
+	bne	!+
+	ldx	#1
+	jsr	chkout
+	DEBUGCHAR('C')
+	#if io_prtstatus
+	{
+		bit debug_mode
+		bpl nodebug
+		lda st
+		jsr hexbout
+	nodebug:
+	}
+	#endif
+	lda	st
+	bne	!+
+	clc
+	.byte	BIT_ZP
+!:	sec
+	php
+	jsr	clrchans
+	DEBUGCHAR('c')
+	lda	#1
 	jsr	close
 	DEBUGCHAR('-')
 	plp
@@ -514,7 +583,7 @@ io_detdrvcurrif:
 {	pha
 	cmp #UNSUPPORTED
 	bne	!+
-	// YR became negative -> it was 0 (unknown) - increase serial count to be sure
+	// Increase serial count to be sure
 ser:
 	inc	io_drivesernum
 end:
@@ -752,6 +821,7 @@ io_drivenames:
 	.text	"YaPE-IEC        " // 14
 	.text	"TCBM2SD         " // 15
 #endif
+	.text	"printer         " // 16
 io_ifnames:
 		//0123456789abcdef
 	.text	"unsupported     " // 0
@@ -814,7 +884,8 @@ iftable:
 	.byte TCBM2SD, TCBM
 #endif
 //	.byte 0,3 //unknown,TCBM
-	.byte UNSUPPORTED, UNKNOWN
+	.byte UNKNOWN, UNSUPPORTED
+	.byte PRINTER, UNSUPPORTED
 	.byte C1540, SERIAL
 	.byte C1541, PARALLEL
 	.byte C1541, SERIAL
