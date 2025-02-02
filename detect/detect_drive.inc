@@ -82,8 +82,8 @@ forcestatus:
 		jsr	io_detc16stm
 	!:
 	#endif
-	jsr	io_detdrvif
 printer:
+	jsr	io_detdrvif
 	#if	io_prtstatus
 	// Print detected drive and interface type
 		lda	io_drivetyp
