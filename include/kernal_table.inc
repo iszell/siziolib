@@ -1,6 +1,13 @@
 #importonce
 .print("CBM KERNAL jump-table")
 
+/* Status bits for disk
+   0: timeout direction: 0: read 1: write
+   1: timeout error
+   4: verify error
+   6: eof
+   7: device not present
+*/
 .label	st	= $90
 
 .label	vidinit	= $ff81
