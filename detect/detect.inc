@@ -22,20 +22,22 @@ detected_hardware:
 	// 1: C64/C128 standard
 	// 2: legacy SIDCard/ReSeed
 	// 3: NAE/CAE
+	// 4: SideKick
 	sid_card_type:
 		.byte 0
 	sid_card_version:
 		.byte 0
+	// 0: none
+	// 1: 6581
+	// 2: 8580
 	sid_1_model:
 		.byte 0
 	sid_1_address:
 		.word 0
-/*
 	sid_2_model:
 		.byte 0
 	sid_2_address:
 		.word 0
-*/
 #if HAS_AY
 	// 0: none
 	// 1: AY-3-891x
@@ -114,6 +116,19 @@ detect: {
 #endif
 #if io_detect_sound
 	jsr detect_sound.detect_sound
+#endif
+#if io_prtstatus
+	bit debug_mode
+	bpl !++
+	jsr primm
+	.text @"- press a key -\$00"
+!:	jsr scnkey
+	beq !-
+	lda #27
+	jsr chrout
+	lda #'d'
+	jsr chrout
+!:
 #endif
 #if io_detect_drive
 	jsr detect_drive.detect

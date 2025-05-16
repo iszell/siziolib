@@ -277,7 +277,6 @@ found:
 	sta fm_address
 	stx fm_address+1
 	#if io_prtstatus
-		jsr fmdebug
 		jsr primm
 		.text @"  FM  \$00"
 		lda fm_address
@@ -307,78 +306,88 @@ notfound:
 	sec
 	rts
 
-detect_opl: {
-	ldy #0
-	ldx	#4
-	lda	#$60
-	jsr	writefmreg
-	lda	#$80
-	jsr	writefmreg
-	lda	(statusptr),y
-	and	#$e0
-	sta	fmstat1
-	ldx	#2
-	lda	#$ff
-	jsr	writefmreg
-	ldx	#4
-	lda	#$21
-	jsr	writefmreg
-	.for	(var i=0; i<72; i++) nop
-	lda	(statusptr),y
-	and	#$e0
-	sta	fmstat2
-	ldx	#4
-	lda	#$60
-	jsr	writefmreg
-	lda	#$80
-	jsr	writefmreg
-	
-	lda	fmstat1: #0
-	bne	!+
+	detect_opl: {
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			jsr primm
+			.text @"?FM: \$00"
+			lda addressptr+1
+			jsr hexbout
+			lda addressptr
+			jsr hexbout
+			lda #':'
+			jsr chrout
+		!:
+		#endif
 
-	lda	fmstat2: #0
-	cmp	#$c0
-	beq	found
-!:
-	#if io_prtstatus
-		jsr fmdebug
-	#endif
-	sec
-	rts
+		ldy #0
+		ldx	#4
+		lda	#$60
+		jsr	writefmreg
+		lda	#$80
+		jsr	writefmreg
+		lda	(statusptr),y
+		and	#$e0
+		sta	fmstat1
+		ldx	#2
+		lda	#$ff
+		jsr	writefmreg
+		ldx	#4
+		lda	#$21
+		jsr	writefmreg
+		.for	(var i=0; i<72; i++) nop
+		lda	(statusptr),y
+		and	#$e0
+		sta	fmstat2
+		ldx	#4
+		lda	#$60
+		jsr	writefmreg
+		lda	#$80
+		jsr	writefmreg
+		
+		lda	fmstat1: #0
+		bne	!+
 
-found:
-	clc
-	rts
-}
+		lda	fmstat2: #0
+		cmp	#$c0
+		beq	found
+	!:
+		sec
+		.byte BIT_ABS
 
-//  3.3us after address  write: 6 NTSC double cycles
-// 35.0us after register write: 41 NTSC double cycles
-writefmreg: {
-	pha
-	txa
-	sta	(addressptr),y
-	.for	(var i=0; i<3; i++) nop
-	pla
-	sta	(dataptr),y
-	.for	(var i=0; i<21; i++) nop
-	rts
-}
+	found:
+		clc
+		php
 
-	#if io_prtstatus
-	fmdebug: {
-		bit debug_mode
-		bpl !+
-		jsr primm
-		.text @"?FM: \$00"
-		lda detect_opl.fmstat1
-		jsr hexbout
-		jsr prtspace
-		lda detect_opl.fmstat2
-		jsr hexbout
-		jsr prtcr
-	!:	rts
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			lda detect_opl.fmstat1
+			jsr hexbout
+			jsr prtspace
+			lda detect_opl.fmstat2
+			jsr hexbout
+			jsr prtcr
+		!:
+		#endif
+
+		plp
+		rts
 	}
-	#endif
+
+	//  3.3us after address  write: 6 NTSC double cycles
+	// 35.0us after register write: 41 NTSC double cycles
+	writefmreg: {
+		pha
+		txa
+		sta	(addressptr),y
+		.for	(var i=0; i<3; i++) nop
+		pla
+		sta	(dataptr),y
+		.for	(var i=0; i<21; i++) nop
+		rts
+	}
 }
 #endif
 
