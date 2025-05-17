@@ -117,35 +117,40 @@ foundsid:
 		inx
 		dey
 		bne !-
-		lda sid_card_type
-		cmp #3
-		bne noprintnae
-		jsr prtspace
-	printnae:
-		ldx #'N'
-		and #$70
-		cmp #$10
-		bne !+
-		lda #'C'
-	!:	txa
-		jsr chrout
-		jsr primm
-		.text @"AE v\$00"
-		lda sid_card_version
-		lsr
-		lsr
-		lsr
-		lsr
-		ora #'0'
-		jsr chrout
-		lda #'.'
-		jsr chrout
-		lda sid_card_version
-		and #$0f
-		ora #'0'
-		jsr chrout
-	noprintnae:
-		jsr prtcr
+		#if HAS_TED
+			lda sid_card_type
+			cmp #3
+			bne noprintnae
+			lda #','
+			jsr chrout
+			jsr prtspace
+		printnae:
+			ldx #'N'
+			lda sid_card_version
+			and #$70
+			cmp #$10
+			beq !+
+			ldx #'C'
+		!:	txa
+			jsr chrout
+			jsr primm
+			.text @"AE v\$00"
+			lda sid_card_version
+			lsr
+			lsr
+			lsr
+			lsr
+			ora #'0'
+			jsr chrout
+			lda #'.'
+			jsr chrout
+			lda sid_card_version
+			and #$0f
+			ora #'0'
+			jsr chrout
+		noprintnae:
+			jsr prtcr
+		#endif
 	#endif
 	rts
 
