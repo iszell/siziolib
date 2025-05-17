@@ -248,7 +248,7 @@ detect_fm: {
 		bcs !+
 		lda #3
 		sta fm_card_type
-		beq found
+		bne found
 	#endif
 !:	ldx #<(fm.address)
 	lda #>(fm.address)
@@ -345,7 +345,7 @@ notfound:
 		jsr	writefmreg
 		lda	#$80
 		jsr	writefmreg
-		
+
 		lda	fmstat1: #0
 		bne	!+
 
@@ -354,13 +354,13 @@ notfound:
 		beq	found
 	!:
 		sec
-		.byte BIT_ABS
+		.byte BIT_ZP
 
 	found:
 		clc
-		php
 
 		#if io_prtstatus
+			php
 			bit debug_mode
 			bpl !+
 			lda detect_opl.fmstat1
@@ -369,10 +369,8 @@ notfound:
 			lda detect_opl.fmstat2
 			jsr hexbout
 			jsr prtcr
-		!:
+		!:	plp
 		#endif
-
-		plp
 		rts
 	}
 
