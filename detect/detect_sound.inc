@@ -238,6 +238,7 @@ detect_fm: {
 .label dataptr		= addressptr+2
 .label statusptr	= dataptr+2
 
+	sei
 	#if HAS_TED
 		ldx #<(soundx.address)
 		lda #>(soundx.address)
@@ -309,6 +310,7 @@ foundend:
 	.byte BIT_ZP
 notfound:
 	sec
+	cli
 	rts
 
 	detect_opl: {
@@ -379,8 +381,9 @@ notfound:
 		rts
 	}
 
-	//  3.3us after address  write: 6 NTSC double cycles
-	// 35.0us after register write: 41 NTSC double cycles
+	//  3.3us after address  write: 6 NTSC double cycles, 4 C64 cycles
+	// 35.0us after register write: 42 NTSC double cycles, 24 C64 cycles
+	// see: https://c64.xentax.com/index.php/15-testing-ym3812-register-write-timing
 	writefmreg: {
 		pha
 		txa
