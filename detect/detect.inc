@@ -60,6 +60,10 @@ detected_hardware:
 		.byte 0
 	fm_address:
 		.word 0
+	fm_data_offset:
+		.byte 0
+	fm_status_offset:
+		.byte 0
 #endif
 #if HAS_DAC
 /*

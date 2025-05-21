@@ -253,8 +253,9 @@ detect_fm: {
 		jsr detect_opl
 		bcs !+
 		lda #3
-		sta fm_card_type
-		bne found
+		ldx #1
+		ldy #0
+		beq found
 	#endif
 !:	ldx #<(fm.address)
 	lda #>(fm.address)
@@ -270,12 +271,17 @@ detect_fm: {
 	bcs notfound
 	#if HAS_TED
 		lda #2
+		ldx #1
+		ldy #2
 	#else
 		lda #1
+		ldx #$10
+		ldy #$20
 	#endif
-	sta fm_card_type
-
 found:
+	sta fm_card_type
+	stx fm_data_offset
+	sty fm_status_offset
 	lda #1
 	sta fm_model
 	lda addressptr
