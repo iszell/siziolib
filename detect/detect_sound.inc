@@ -239,25 +239,7 @@ detect_fm: {
 .label statusptr	= dataptr+2
 
 	sei
-	#if HAS_TED
-		ldx #<(soundx.address)
-		lda #>(soundx.address)
-		stx addressptr
-		sta addressptr+1
-		ldx #<(soundx.data)
-		stx dataptr
-		sta dataptr+1
-		ldx #<(soundx.status)
-		stx statusptr
-		sta statusptr+1
-		jsr detect_opl
-		bcs !+
-		lda #3
-		ldx #1
-		ldy #0
-		beq found
-	#endif
-!:	ldx #<(fm.address)
+	ldx #<(fm.address)
 	lda #>(fm.address)
 	stx addressptr
 	sta addressptr+1
@@ -268,15 +250,34 @@ detect_fm: {
 	stx statusptr
 	sta statusptr+1
 	jsr detect_opl
-	bcs notfound
 	#if HAS_TED
+		bcs !+
 		lda #2
 		ldx #1
 		ldy #2
+		bne found
 	#else
+		bcs notfound
 		lda #1
 		ldx #$10
 		ldy #$20
+	#endif
+	#if HAS_TED
+	!:	ldx #<(soundx.address)
+		lda #>(soundx.address)
+		stx addressptr
+		sta addressptr+1
+		ldx #<(soundx.data)
+		stx dataptr
+		sta dataptr+1
+		ldx #<(soundx.status)
+		stx statusptr
+		sta statusptr+1
+		jsr detect_opl
+		bcs notfound
+		lda #3
+		ldx #1
+		ldy #0
 	#endif
 found:
 	sta fm_card_type
@@ -398,6 +399,7 @@ notfound:
 		pla
 		sta	(dataptr),y
 		.for	(var i=0; i<21; i++) nop
+		rts
 		rts
 	}
 }
