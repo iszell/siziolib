@@ -45,7 +45,7 @@
 .label	pio_parport 	= $fd10
 .label	pio_keyboard 	= $fd30
 .label	rom_bank_latch 	= $fdd0
-	
+
 .label	ted_base	= $ff00
 
 // Expansions
@@ -113,14 +113,20 @@
 // SoundX OPL-II/MIDI card
 // https://github.com/SukkoPera/SoundX/
 .label soundx_base	= $fde0
+#define HAS_MIDI
 .namespace soundx {
+	// see ACIA
+	.label	midi_data		= soundx_base + 0
+	.label	midi_status		= soundx_base + 1
+	.label	midi_command	= soundx_base + 2
+	.label	midi_control	= soundx_base + 3
+
 	.label	address	= soundx_base+4
 	.label	data	= address + 1
 	.label	status	= address
 }
 
 .label	sid_csory	= $fe80
-
 
 // SideKick NeoRAM (https://github.com/frntc/Sidekick64)
 // block: select 16k block of memory (max. 4M)

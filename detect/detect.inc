@@ -65,6 +65,14 @@ detected_hardware:
 	fm_status_offset:
 		.byte 0
 #endif
+#if HAS_MIDI
+	// 0: none
+	// 1: SoundX
+	midi_card_type:
+		.byte 0
+	midi_address:
+		.word 0
+#endif
 #if HAS_DAC
 /*
 	// 0: none

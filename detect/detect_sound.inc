@@ -31,6 +31,9 @@ detect_sound:
 	#if HAS_FM
 		jsr detect_fm
 	#endif
+	#if HAS_MIDI
+		jsr detect_midi
+	#endif
 	#if HAS_DAC
 		jsr detect_dac
 	#endif
@@ -103,7 +106,7 @@ foundsid:
 		jsr prtcr
 	!:
 		jsr primm
-		.text @"  SID \$00"
+		.text @"  SID  \$00"
 		lda sidptr
 		ldx sidptr+1
 		jsr printaddr
@@ -199,7 +202,7 @@ ym2149:
 	stx ay_address+1
 	#if io_prtstatus
 		jsr primm
-		.text @"  AY  \$00"
+		.text @"  AY   \$00"
 		lda ay_address
 		ldx ay_address+1
 		jsr printaddr
@@ -291,7 +294,7 @@ found:
 	stx fm_address+1
 	#if io_prtstatus
 		jsr primm
-		.text @"  FM  \$00"
+		.text @"  FM   \$00"
 		lda fm_address
 		ldx fm_address+1
 		jsr printaddr
@@ -400,6 +403,115 @@ notfound:
 		sta	(dataptr),y
 		.for	(var i=0; i<21; i++) nop
 		rts
+	}
+}
+#endif
+
+#if HAS_MIDI
+detect_midi: {
+.label addressptr	= sidptr
+
+	sei
+	ldx #<(soundx.midi_data)
+	lda #>(soundx.midi_data)
+//	ldx #<(acia_base)
+//	lda #>(acia_base)
+	stx addressptr
+	sta addressptr+1
+	jsr detect_acia
+	bcs notfound
+
+	lda #1
+	sta midi_card_type
+	lda addressptr
+	ldx addressptr+1
+	sta midi_address
+	stx midi_address+1
+	#if io_prtstatus
+		jsr primm
+		.text @"  MIDI \$00"
+		lda midi_address
+		ldx midi_address+1
+		jsr printaddr
+		ldx midi_card_type
+		dex
+		bne !+
+		jsr primm
+		.text @"SoundX\$00"
+	!:	jsr prtcr
+	#endif
+	clc
+	.byte BIT_ZP
+notfound:
+	sec
+	cli
+	rts
+
+	detect_acia: {
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			jsr primm
+			.text @"?MIDI: \$00"
+			lda addressptr+1
+			jsr hexbout
+			lda addressptr
+			jsr hexbout
+			lda #':'
+			jsr chrout
+		!:
+		#endif
+		ldy #(acia.status - acia_base)
+		// reset ACIA
+		sta (addressptr),y
+		// Configure ACIA for No Parity, No Echo, No TX Interrupt, /RTS Low (Unneeded), No RX Interrupt, /DTR Low (Unneeded)
+		lda #$0B
+		ldy #(acia.command-acia_base)
+		sta (addressptr),y
+		// 0 Stop Bits, 8 Data Bits, Internal Baud Rate Generator, 19200 bps (which will actually be 31250 due to 3 MHz xtal)
+		lda #$1F
+		ldy #(acia.control-acia_base)
+		sta (addressptr),y
+
+		ldy #(acia.command-acia_base)
+		lda (addressptr),y
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			pha
+			jsr hexbout
+			jsr prtspace
+			pla
+		!:
+		#endif
+		cmp #$0B
+		bne notfound
+
+		ldy #(acia.control-acia_base)
+		lda (addressptr),y
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			pha
+			jsr hexbout
+			pla
+		!:
+		#endif
+		cmp #$1F
+		bne notfound
+
+		clc
+		.byte BIT_ZP
+	notfound:
+		sec
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			php
+			jsr prtcr
+			plp
+		!:
+		#endif
 		rts
 	}
 }
