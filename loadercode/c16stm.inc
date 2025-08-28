@@ -42,7 +42,6 @@ loaderror:
 	jsr sendrecievebyte
 	sta length		// file size
 	jsr sendrecievebyte
-// increase length by $100 so when it's high byte for better finished check
 	sta length+1
 	
 	jsr sendandreceive
@@ -73,7 +72,6 @@ loaderror:
 	pha
 #endif
 !:
-
 	jsr declength
 	jsr declength
 
@@ -83,7 +81,6 @@ loaderror:
 	jsr sendrecievebyte
 	lda length+1
 	jsr sendrecievebyte
-	inc length+1
 
 	ldy #0
 !:	jsr sendrecievebyte
@@ -130,10 +127,11 @@ sendrecievebyte:
 #endif
 
 declength:
-	dec length
+	lda length+1
 	bne !+
 	dec length+1
-!:	rts
+!:	dec length
+	rts
 
 length:
 	.word	0
