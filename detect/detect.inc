@@ -51,6 +51,12 @@ detected_hardware:
 		.byte 0
 	ay_address:
 		.word 0
+	ay_address_offset:
+		.byte 0
+	ay_read_offset:
+		.byte 0
+	ay_write_offset:
+		.byte 0
 #endif
 #if HAS_FM
 	// 0: none

@@ -66,7 +66,7 @@ detect_sid: {
 		stx sidptr+1
 		jsr detect_sid_address
 	#endif
-	
+
 	bcc foundsid
 	#if io_prtstatus
 		bit debug_mode
@@ -167,48 +167,76 @@ detect_ay: {
 .const AY_TEST_DATA = %01011010
 	ldy	#15
 	lda	#0
-!:	jsr	writeayreg
+!:	sty digimoooz.ay_address
+	sta digimoooz.ay_write
 	dey
 	bpl	!-
 
-	ldy	#1
-	lda	#AY_TEST_DATA
-	jsr	writeayreg
-	jsr	readayreg
-	#if io_prtstatus
-		bit debug_mode
-		bpl !+
-		pha
-		jsr primm
-		.text @"?AY: \$00"
-		pla
-		pha
-		jsr hexbout
-		jsr prtcr
-		pla
-	!:
-	#endif
-	ldx #2
-	cmp #AY_TEST_DATA
-	beq ym2149
-	cmp	#AY_TEST_DATA & $0f
-	bne	noay
-	dex
-ym2149:
+	ldy #1
+	lda #AY_TEST_DATA
+	sty digimoooz.ay_address
+	sta digimoooz.ay_write
+
+	sty digimoooz.ay_address
+	lda digimoooz.ay_read
+	jsr check_ay
+	bcs nodigimoooz
+
 	stx ay_model
+	lda #2
+	sta ay_card_type
+	lda #<digimoooz.ay
+	ldx #>digimoooz.ay
+	sta ay_address
+	stx ay_address+1
+	ldx #0
+	stx ay_address_offset
+	inx
+	stx ay_read_offset
+	stx ay_write_offset
+	jmp ay_found
+
+nodigimoooz:
+	ldy	#15
+	lda	#0
+!:	sty ay.address
+	sta ay.write
+	dey
+	bpl	!-
+
+	ldy #1
+	lda #AY_TEST_DATA
+	sty ay.address
+	sta ay.write
+
+	sty ay.address
+	lda ay.read
+	jsr check_ay
+	bcc !+
+	jmp noay
+
+!:	stx ay_model
+	lda #1
+	sta ay_card_type
 	lda #<ay_base
 	ldx #>ay_base
 	sta ay_address
 	stx ay_address+1
-	lda #1
-	sta ay_card_type
+	ldx #0
+	stx ay_read_offset
+	inx
+	stx ay_write_offset
+	inx
+	stx ay_address_offset
+
+ay_found:
 	#if io_prtstatus
 		jsr primm
 		.text @"  AY   \$00"
 		lda ay_address
 		ldx ay_address+1
 		jsr printaddr
-		
+	
 		ldx ay_model
 		dex
 		bne ym
@@ -235,22 +263,40 @@ ym2149:
 	!end_ay_card:
 		jsr prtcr
 	#endif
-	
+
 	clc
 	.byte BIT_ZP
 noay:
 	sec
 	rts
 
-writeayreg:
-	sty	ay.address
-	sta	ay.write
+check_ay: {
+	#if io_prtstatus
+		bit debug_mode
+		bpl !+
+		pha
+		jsr primm
+		.text @"?AY: \$00"
+		pla
+		pha
+		jsr hexbout
+		jsr prtcr
+		pla
+	!:
+	#endif
+	ldx #2
+	cmp #AY_TEST_DATA
+	beq ym2149
+	cmp	#AY_TEST_DATA & $0f
+	bne	noay
+	dex
+ym2149:
+	clc
 	rts
-
-readayreg:
-	sty	ay.address
-	lda	ay.read
+noay:
+	sec
 	rts
+}
 }
 #endif
 
@@ -646,7 +692,7 @@ detect_sid_address: {
 !:	sta (sidptr),y
 	dey
 	bpl !-
-	
+
 	ldy #25
 	lda (sidptr),y
 	iny
@@ -697,23 +743,23 @@ detect_sid_model: {
 //Set a low frequency for Oscillator
 // (Voice 3) #$0200 which is somewhere
 // between B-0 and C-1, according to demo
-	
+
 	ldy #15
 	lda #$02
 	sta (sidptr),y
-	
+
 //Set Sawtooth and Triangle waveforms for
 //voice 3 and start release of ADSR
-	
+
 	ldy #18
 	lda #%00110000
 	sta (sidptr),y
-	
+
 //Check if output of voice 3 ever goes
 //higher than $80. It's only possible on
 //new SID chip (8580) and never on the
 //old one (6581)
-	
+
 	ldy #0
 	ldx #0
 	sty ystore
