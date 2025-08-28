@@ -127,14 +127,14 @@
 }
 
 // DigiMoooZ AY-3-8910/DAC card
-.label digimoooz_base	= $fde9
+.label digimoooz_base	= $fdea
 .namespace digimoooz {
 	// see ay.inc
-	.label	ay		= digimoooz_base + 1
-	.label	read	= ay
-	.label	write	= read + 1
-	.label	address	= write + 1
-	.label	dac		= digimoooz_base + 3
+	.label	ay		= digimoooz_base
+	.label	address	= ay
+	.label	read	= ay +1
+	.label	write	= ay + 1
+	.label	dac		= digimoooz_base + 2
 }
 
 .label	sid_csory	= $fe80
