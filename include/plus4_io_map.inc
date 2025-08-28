@@ -126,6 +126,17 @@
 	.label	status	= address
 }
 
+// DigiMoooZ AY-3-8910/DAC card
+.label digimoooz_base	= $fdea
+.namespace digimoooz {
+	// see ay.inc
+	.label	ay		= digimoooz_base
+	.label	address	= ay
+	.label	read	= ay +1
+	.label	write	= ay + 1
+	.label	dac		= digimoooz_base + 2
+}
+
 .label	sid_csory	= $fe80
 
 // SideKick NeoRAM (https://github.com/frntc/Sidekick64)

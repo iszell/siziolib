@@ -200,6 +200,8 @@ ym2149:
 	ldx #>ay_base
 	sta ay_address
 	stx ay_address+1
+	lda #1
+	sta ay_card_type
 	#if io_prtstatus
 		jsr primm
 		.text @"  AY   \$00"
@@ -215,8 +217,25 @@ ym2149:
 		jmp !+
 	ym:	jsr primm
 		.text @"YM2149\$00"
-	!:	jsr prtcr
+	!:	lda #','
+		jsr chrout
+		lda #' '
+		jsr chrout
+		lda ay_card_type
+		cmp #1
+		bne !+
+		jsr primm
+		.text @"DIGIMUZ\$00"
+		jmp !end_ay_card+
+	!:	cmp #2
+		bne !+
+		jsr primm
+		.text @"DigiMoooZ\$00"
+	!:
+	!end_ay_card:
+		jsr prtcr
 	#endif
+	
 	clc
 	.byte BIT_ZP
 noay:
@@ -519,12 +538,9 @@ notfound:
 
 #if HAS_DAC
 detect_dac: {
-/*
 	#if !HAS_TED
-*/
 		sec
 		rts
-/*
 	#endif
 	#if HAS_TED
 		lda sid_card_type
@@ -533,6 +549,17 @@ detect_dac: {
 		lda #2
 		bne found
 	nonae:
+		lda ay_card_type
+		cmp #2
+		bne nodigimoooz
+		lda #<digimoooz.dac
+		ldx #>digimoooz.dac
+		sta dac_address
+		stx dac_address+1
+		lda #4
+		sta dac_model
+		bne founddigimoooz
+	nodigimoooz:
 		lda sid_solder+$1f
 		and sid_solder+$1f
 		tax
@@ -579,9 +606,10 @@ detect_dac: {
 		lda sid_1_address+1
 		adc #0
 		sta dac_address+1
+	founddigimoooz:
 	#if io_prtstatus
 		jsr primm
-		.text @"  DAC \$00"
+		.text @"  DAC  \$00"
 		lda dac_address
 		ldx dac_address+1
 		jsr printaddr
@@ -591,6 +619,11 @@ detect_dac: {
 		bne !+
 		jsr detect_sid.printnae
 		jmp end
+	!:	cmp #4
+		bne !+
+		jsr primm
+		.text @"DigiMoooZ\$0d\$00"
+		jmp end
 	!:	jsr primm
 		.text @"DigiBlaster\$0d\$00"
 	#endif
@@ -598,7 +631,6 @@ end:
 	clc
 	#endif
 	rts
-*/
 }
 #endif
 

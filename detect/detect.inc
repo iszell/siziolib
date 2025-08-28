@@ -40,6 +40,11 @@ detected_hardware:
 		.word 0
 #if HAS_AY
 	// 0: none
+	// 1: DIGIMUZ
+	// 2: DigiMoooZ
+	ay_card_type:
+		.byte 0
+	// 0: none
 	// 1: AY-3-891x
 	// 2: YM2149
 	ay_model:
@@ -74,10 +79,11 @@ detected_hardware:
 		.word 0
 #endif
 #if HAS_DAC
-/*
 	// 0: none
 	// 1: DigiBlaster
 	// 2: NAE/CAE
+	// 3: ReVox
+	// 4: DigiMoooZ
 	dac_card_type:
 		.byte 0
 	dac_card_version:
@@ -86,7 +92,6 @@ detected_hardware:
 		.byte 0
 	dac_address:
 		.word 0
-*/
 #endif
 #endif
 #if io_detect_drive

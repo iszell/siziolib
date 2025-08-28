@@ -19,7 +19,7 @@ sync:
 startload:
 	stx	filename
 	sty	filename+1
-startload2:
+
 	lda	#$52		// fopen
 	jsr	sendrecievebyte
 	ldx #0
