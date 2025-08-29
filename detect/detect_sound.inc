@@ -688,32 +688,15 @@ end:
 //=======================================
 
 detect_sid_address: {
+	lda #0
 	ldy #24
-!:	sta (sidptr),y
+!:	ora (sidptr),y
 	dey
 	bpl !-
 
-	ldy #25
-	lda (sidptr),y
-	iny
-	and (sidptr),y
-	cmp #$ff
-	beq sidfound
-// Either PotX or PotY is not $ff - no SID or paddle is not fully left - try alternative detection
-// Reset SID (again)
-	ldy #24
-	lda #0
-!:	sta (sidptr),y
-	dey
-	bpl !-
-// Read oscillator 3 - should be always 0
-	ldx #0
-	ldy #27
-!:	lda (sidptr),y
+	cmp #0
 	bne !+
-	dex
-	bne !-
-sidfound:
+
 	clc
 	.byte BIT_ZP
 !:	sec
