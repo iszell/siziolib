@@ -592,6 +592,8 @@ detect_dac: {
 		lda sid_card_type
 		cmp #3
 		bne nonae
+		lda sid_card_version
+		sta dac_card_version
 		lda #2
 		bne found
 	nonae:
@@ -603,7 +605,7 @@ detect_dac: {
 		sta dac_address
 		stx dac_address+1
 		lda #4
-		sta dac_model
+		sta dac_card_type
 		bne founddigimoooz
 	nodigimoooz:
 		lda sid_solder+$1f
@@ -625,9 +627,9 @@ detect_dac: {
 		.byte BIT_ZP
 	found:
 		clc
+	#if io_prtstatus
 		php
 		pha
-	#if io_prtstatus
 		bit debug_mode
 		bpl !+
 		jsr primm
@@ -639,12 +641,12 @@ detect_dac: {
 		jsr hexbout
 		jsr prtcr
 	!:
-	#endif
 		pla
 		plp
+	#endif
 		bcc !+
 		rts
-	!:	sta dac_model
+	!:	sta dac_card_type
 		clc
 		lda sid_1_address
 		adc #$1e
@@ -660,7 +662,7 @@ detect_dac: {
 		ldx dac_address+1
 		jsr printaddr
 
-		lda dac_model
+		lda dac_card_type
 		cmp #2
 		bne !+
 		jsr detect_sid.printnae

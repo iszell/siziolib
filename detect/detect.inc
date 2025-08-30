@@ -94,8 +94,6 @@ detected_hardware:
 		.byte 0
 	dac_card_version:
 		.byte 0
-	dac_model:
-		.byte 0
 	dac_address:
 		.word 0
 #endif
