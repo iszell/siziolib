@@ -35,7 +35,8 @@ testdisk.d64 testdisk.d71 testdisk.d81: $(SUBDIRS)
 		-f "hwdetect-64" -w hwdetect/hwdetect64.prg \
 		-f "init" -w loader/init.prg \
 		-f "initquiet" -w loader/initquiet.prg \
-		-f "stripped loader" -w loader/strippedtest.prg \
+		-f "stripped loader" -w loader/stripped.prg \
+		-f "stripped test" -w loader/strippedtest.prg \
 		$@
 
 extract: testdisk.d64
