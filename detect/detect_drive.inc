@@ -537,6 +537,8 @@ readstatus: {
 	lda	st
 	bne	enderr
 !:	jsr	chrin
+	ldy st
+	bne	enderr
 	ldx	statuslen
 	sta	statustxt,x
 	inc	statuslen
