@@ -152,8 +152,8 @@ foundsid:
 			ora #'0'
 			jsr chrout
 		noprintnae:
-			jsr prtcr
 		#endif
+		jsr prtcr
 	#endif
 	rts
 
@@ -369,7 +369,7 @@ found:
 		dex
 		bne !+
 		jsr primm
-		.text @"Sound Expander\$00"
+		.text @"Snd Expander\$00"
 		jmp foundend
 	!:	dex
 		bne !+
