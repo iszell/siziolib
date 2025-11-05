@@ -843,24 +843,25 @@ io_ifnames:
 //    other: drive type id
 io_drvaddr:
 	.byte	$00,$c0,$4d,FD2000
-	.byte	$00,$c0,$c0,C1581
-	.byte	$00,$c0,$4a,C1581
-	.byte	$00,$c0,$2b,C1581
-	.byte	$00,$c0,$38,C1571
-	.byte	$00,$c0,$84,C1571
-	.byte	$00,$c0,$42,C1571
 	.byte	$00,$c0,$be,C1551
 	.byte	$00,$c0,$51,C1570
+	.byte	$00,$c0,$33,C1571
+	.byte	$00,$c0,$38,C1571
+	.byte	$00,$c0,$42,C1571
+	.byte	$00,$c0,$84,C1571
+	.byte	$00,$c0,$2b,C1581
+	.byte	$00,$c0,$4a,C1581
+	.byte	$00,$c0,$c0,C1581
 	.byte	$00,$c0,$ff,RF501C
 	.byte	$00,$c0,$97,UNKNOWN
-	.byte	$01,$c0,$e0,C1541II
 	.byte	$01,$c0,$46,C1541C
+	.byte	$01,$c0,$e0,C1541II
 	.byte	$01,$c0,$aa,UNKNOWN
 	.byte	$fa,$ff,$e7,C1540
 	.byte	$fa,$ff,$01,UNKNOWN
-	.byte	$a3,$ea,$fe,C1541C
 	.byte	$a3,$ea,$ff,C1541
 	.byte	$a3,$ea,$02,C1541 // SpeedDOS
+	.byte	$a3,$ea,$fe,C1541C
 io_drvaddre:
 
 // format: null terminated string up to 6 characters or 7 characters without null termination
