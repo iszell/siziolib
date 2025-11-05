@@ -1,6 +1,6 @@
 include ../defaults.mk
 
-all: hwdetectplus4.prg hwdetect64.prg
+all: hwdetectplus4.prg hwdetect64.prg hwdetect128.prg
 
 clean:
 	$(CLEANCMD)
@@ -12,3 +12,7 @@ clean:
 hwdetect64.prg: hwdetect64.asm ../detect/*.inc
 	$(KICKASS) $(KICKASSOPTS) -o hwdetect64.tmp hwdetect64.asm
 	$(EXOMIZER) sfx basic -t 64 -n -o $@ hwdetect64.tmp
+
+hwdetect128.prg: hwdetect128.asm ../detect/*.inc
+	$(KICKASS) $(KICKASSOPTS) -o hwdetect128.tmp hwdetect128.asm
+	$(EXOMIZER) sfx basic -t 128 -n -o $@ hwdetect128.tmp
