@@ -95,6 +95,7 @@ noloader:
 	.text	@"  Downloading drive code... \$00"
 	#endif
 // Download drive code
+	php
 	ldx	$ae
 	lda	#15
 	tay
@@ -171,6 +172,7 @@ wrtnxt:	ldx	#15
 	jsr	clrchans
 	lda	#15
 	jsr	close
+	plp
 nodrivesidecode:
 	#if	io_prtstatus
 		jsr	primm

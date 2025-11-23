@@ -10,7 +10,8 @@
 quit:
 	jmp $fff6
 
-!:	jsr	iolib.loader.init
+!:	sei
+	jsr	iolib.loader.init
 	bcs  quit
 
 	ldx #end - loadcode - 1
@@ -21,14 +22,11 @@ quit:
 	jmp loader
 
 loadcode:
-	sei
 	sta ted.ramen
 	.encoding "petscii_mixed"
 	ldx #'i'
 	ldy #'i'
 	jsr iolib.decrunch
-	sta ted.romen
-	cli
 	jmp $100d
 end:
 
