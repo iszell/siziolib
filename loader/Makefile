@@ -1,6 +1,6 @@
 include ../defaults.mk
 
-all: init.prg initquiet.prg stripped.prg strippedtest.prg
+all: init.prg initquiet.prg stripped.prg strippedtest.prg stripped2.prg
 
 clean:
 	$(CLEANCMD)
@@ -22,6 +22,9 @@ hwdetect64.prg: hwdetect64.asm
 	$(EXOMIZER) sfx basic -t 64 -n -o $@ hwdetect64.tmp
 
 stripped.prg: stripped.asm
+	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<
+
+stripped2.prg: stripped2.asm
 	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<
 
 strippedtest.prg: strippedtest.asm stripped.asm

@@ -37,6 +37,7 @@ testdisk.d64 testdisk.d71 testdisk.d81: $(SUBDIRS)
 		-f "initquiet" -w loader/initquiet.prg \
 		-f "stripped loader" -w loader/stripped.prg \
 		-f "stripped test" -w loader/strippedtest.prg \
+		-f "stripped altern." -w loader/stripped2.prg \
 		$@
 
 extract: testdisk.d64
