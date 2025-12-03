@@ -11,6 +11,7 @@ init:
 .label	ptr	=	2
 
 #if	need_loader
+	php
 	.print	". loader init"
 	lda iolib.detect.drive_interface_type
 	cmp #SERIAL
@@ -245,6 +246,7 @@ nottcbm:
 		jsr	primm
 		.text	@"\$0dInitialization complete\$0d\$00" 
 	#endif
+	plp
 	clc
 	rts
 io_noloader:
@@ -252,6 +254,7 @@ io_noloader:
 		jsr	primm
 		.text	@"\$0dError: no loader for drive!\$0d\$00" 
 	#endif
+	plp
 	sec
 	rts
 	

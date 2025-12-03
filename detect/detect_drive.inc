@@ -18,6 +18,7 @@ detect:
 .label	currdrive	= $ba
 #endif
 .const	lastdrive	= 15
+	php
 	lda #0
 	sta nodefaultdrive
 	sta c16stmdevice
@@ -42,6 +43,7 @@ detect:
 		jsr	io_prtdrivenum
 		jsr	prtcr
 	#endif
+	plp
 	rts
 	
 io_detectdrvtp: {
