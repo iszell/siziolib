@@ -1,6 +1,6 @@
 include ../defaults.mk
 
-all: init.prg initquiet.prg stripped.prg strippedtest.prg stripped2.prg
+all: init.prg initquiet.prg stripped.prg strippedtest.prg stripped2.prg stripped500.prg
 
 clean:
 	$(CLEANCMD)
@@ -25,6 +25,9 @@ stripped.prg: stripped.asm
 	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<
 
 stripped2.prg: stripped2.asm
+	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<
+
+stripped500.prg: stripped500.asm
 	$(KICKASS) -showmem -symbolfile -libdir $(INCDIR) -bytedumpfile $(basename $@).lst -o $@ $<
 
 strippedtest.prg: strippedtest.asm stripped.asm
