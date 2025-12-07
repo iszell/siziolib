@@ -44,7 +44,7 @@ quit:
 // Include loader code (drive detection and loader)
 	#define need_loader
 // Handle preset load address flag
-	#define need_loadflag
+//	#define need_loadflag
 
 // Include exomizer on-the-fly decruncher
 //	#define need_exodecrunch

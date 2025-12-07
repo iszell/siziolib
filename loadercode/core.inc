@@ -39,6 +39,7 @@
 	bne !+
 	jsr readbyte
 	jsr readbyte
+	sec
 	jmp loaderror
 !:	ldy #0
 loadloop:

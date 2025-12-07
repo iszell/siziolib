@@ -539,8 +539,8 @@ readstatus: {
 	lda	st
 	bne	enderr
 !:	jsr	chrin
-	ldy st
-	bne	enderr
+//	ldy st
+//	bne	enderr
 	ldx	statuslen
 	sta	statustxt,x
 	inc	statuslen
@@ -554,7 +554,8 @@ readstatus: {
 	bne enderr
 	clc
 	.byte BIT_ZP
-enderr:	sec
+enderr:
+	sec
 	php
 	jsr	clrchans
 	lda	#15
