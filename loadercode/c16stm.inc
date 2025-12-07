@@ -127,10 +127,12 @@ sendrecievebyte:
 #endif
 
 declength:
-	lda length+1
+	lda length
 	bne !+
 	dec length+1
 !:	dec length
+	lda length
+	ora length+1
 	rts
 
 length:
