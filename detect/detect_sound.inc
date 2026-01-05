@@ -608,6 +608,8 @@ detect_dac: {
 		sta dac_card_type
 		bne founddigimoooz
 	nodigimoooz:
+		lda sid_card_type
+		beq notfound
 		lda sid_solder+$1f
 		and sid_solder+$1f
 		tax
