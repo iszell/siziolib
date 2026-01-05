@@ -23,10 +23,13 @@ detect:
 	sta nodefaultdrive
 	sta c16stmdevice
 // default to drive 8 if last used # is less than that
-	lda	#8
-	cmp	currdrive
-	bcc	!+
-	inc nodefaultdrive
+	lda	currdrive
+	cmp #8
+	bcc !+
+	cmp #lastdrive+1
+	bcc !++
+!:	inc nodefaultdrive
+	lda #8
 	sta	currdrive
 !:	lda	#0
 	sta	io_drivetyp
@@ -831,11 +834,11 @@ io_ifnames:
 		//0123456789abcdef
 	.text	"unsupported     " // 0
 	.text	"serial          " // 1
-	.text	"TCBM            " // 3
-	.text	"parallel        " // 4
-	.text	"TCBM standard   " // 5
-	.text	"IEEE-488        " // 6
-	.text	"expansion port  " // 7
+	.text	"TCBM            " // 2
+	.text	"parallel        " // 3
+	.text	"TCBM standard   " // 4
+	.text	"IEEE-488        " // 5
+	.text	"expansion port  " // 6
 	#endif
 
 //Structure:
