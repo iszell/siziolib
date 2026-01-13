@@ -2,6 +2,8 @@
 	.print	"Siz IOLib hardware detection code"
 	.encoding "petscii_mixed"
 
+//#define DEBUG_DETECT
+
 	.namespace iolib {
 	.namespace detect {
 detected_hardware:
@@ -205,9 +207,20 @@ init: {
 		lda #-1
 		.byte BIT_ABS
 	nodebug:
+#if DEBUG_DETECT
+		lda #-1
+#else
 		lda #0
+#endif
 		sta debug_mode
 	#endif
+	// C16STM old firmware workaround
+#if HAS_TED
+	lda #%00001111
+	sta cpu_dir
+	lda #%11001000
+	sta cpu_port
+#endif
 	rts
 }
 
