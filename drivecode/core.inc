@@ -114,13 +114,17 @@ readfnam:
 	ora #ledvalue
 	}
 	sta ledport
+#if !NO_DRIVE_IRQ
 	cli
+#endif
 	.if (drive_serial) {
 	lda #%00000001
 !:	bit serialdata
 	beq !-
 	}
+#if !NO_DRIVE_IRQ
 	sei
+#endif
 	.if (drive_serial) {
 	lda #%00000000
 	sta serialdata
@@ -147,7 +151,10 @@ readfnam:
 readblock:
 	ldy #5
 	sty retrycnt
-retry:	cli
+retry:
+#if !NO_DRIVE_IRQ
+	cli
+#endif
 	lda #$80		// command: read sector
 	sta blk4job
 !:	lda blk4job
@@ -172,9 +179,14 @@ retry:	cli
 readerror:
 	pla
 	pla
+#if !NO_DRIVE_IRQ
 	sei
+#endif
 	jmp senderror
-readok:	sei
+readok:
+#if !NO_DRIVE_IRQ
+	sei
+#endif
 	rts
 temp1:	.byte	0
 temp2:	.byte	0

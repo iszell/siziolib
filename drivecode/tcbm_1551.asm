@@ -3,9 +3,9 @@
 	*=$0500
 {
 
+#define NO_DRIVE_IRQ
 .var	drive_serial	= false
 .var	ledinverted	= true
-
 	#import	"core.inc"
 
 .label	cpuport  = $01
@@ -107,7 +107,6 @@ Address		6523 TIA ($4000-$4007)
 	driveload(init, dirtrack, dirsect, blk4trk, blk4sec, blk4job, blk4buf, retrycnt, hdrid1, hdrid2, drv0id1, drv0id2, readbyte, writebyte, ledport, ledvalue, 0, drive_serial, ledinverted)
 
 init:
-	sei
 	cld
     lda #%11111111	//dir=output
     sta padir
