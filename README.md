@@ -162,3 +162,7 @@ $ff40-$ffdc | Exomizer decruncher work area. Will be overwritten during Exomizer
 * Implement TCBM2SD fast load protocol
 * Implement 2 bit serial protocol for single serial drives
 * Implement track loading capability for physical disk drives
+
+## Links
+
+[![Hypercommit](https://img.shields.io/badge/Hypercommit-DB2475)](https://hypercommit.com/siziolib)
