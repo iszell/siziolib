@@ -134,6 +134,9 @@ detect: {
 #if io_detect_video
 	jsr detect_video_standard
 #endif
+#if io_detect_cpu_port
+	jsr detect_cpu_port_type
+#endif
 #if io_detect_memory_size
 	jsr detect_memory_size.detect
 #endif
@@ -155,9 +158,6 @@ detect: {
 #endif
 #if io_detect_drive
 	jsr detect_drive.detect
-#endif
-#if io_detect_cpu_port
-	jsr detect_cpu_port_type
 #endif
 #if io_detect_emulator
 	jsr detect_emulator
@@ -216,9 +216,11 @@ init: {
 	#endif
 	// C16STM old firmware workaround
 #if HAS_TED
-	lda #%00001111
+//	lda #%00001111
+	lda $f30c
 	sta cpu_dir
-	lda #%11001000
+//	lda #%00001000
+	lda $f310
 	sta cpu_port
 #endif
 	rts
@@ -256,6 +258,11 @@ init: {
 #endif
 
 #if io_detect_cpu_port
+/*
+- On an 8501 P0 is used for writing the floppy data line: this becomes P3 with the 6510 adapter
+- P6 is used for reading the floppy clock line: this becomes P5
+- P7 is used for reading the floppy data line: this becomes P0
+*/
 	.print ". CPU I/O port type detection"
 	.memblock "CPU I/O port type detection"
 	detect_cpu_port_type: {

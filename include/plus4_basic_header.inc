@@ -4,7 +4,7 @@
 
 {
 	.word basend
-	.word 2025
+	.word 2026
 	.byte $9e	// BASIC SYS token
 	.text "4109"
 	.byte 0
