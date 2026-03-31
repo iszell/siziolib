@@ -12,11 +12,14 @@ detect:
 .label	testaddr	=	$fcff
 	sei
 	ldy	#$ff
+// Do not detect memory expansions without ACIA
+	lda acia_type
+	beq !+
 // Reset Csory expansion control
 	sty	ramexpctrl_csory
 // Reset Hannes expansion control
 	sty	ramexpctrl_hannes
-	iny
+!:	iny
 	sty	ted.ramen
 
 // Save and Reset detection address contents
@@ -45,6 +48,8 @@ detect:
 !:	sty	memsize
 	cpy	#2
 	bne	!+
+	lda acia_type
+	beq !+
 	jsr	io_detmem_hannes
 	jsr	io_detmem_csory
 !:	jsr	io_detmem_neoram
