@@ -627,8 +627,8 @@ nottcbm:
 	bne	io_notpar
 	// YR was 4 (parallel) - do actual parallel probe
 	#if	HAS_TED
-		// do not detect parallel port when no ACIA is present
-		lda acia_type
+		// do not detect parallel port when it's not present
+		lda userport_type
 		beq io_detdrvcurriffail
 		lda	#$ff
 		sta	pio_parport

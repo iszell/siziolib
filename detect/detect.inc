@@ -15,6 +15,14 @@ detected_hardware:
 	acia_type:
 		.byte	0
 #endif
+#if HAS_TED && (io_detect_memory_size || io_detect_drive)
+	#define io_detect_userport
+	// 0: not present
+	// 1: 6529 or compatible on full address range
+	// 2: 6529 or compatible at $fd10 only
+	userport_type:
+		.byte	0
+#endif
 #if io_detect_memory_size
 	// 0: Stock
 	// 1: Hannes
@@ -143,6 +151,9 @@ detect: {
 #endif
 #if io_detect_acia
 	jsr detect_acia
+#endif
+#if io_detect_userport
+	jsr detect_userport
 #endif
 #if io_detect_memory_size
 	jsr detect_memory_size.detect
@@ -350,6 +361,51 @@ init: {
 			#endif
 			rts
 		}
+	}
+#endif
+
+#if io_detect_userport
+	.print ". User port detection"
+	.memblock "User port detection"
+	detect_userport: {
+		#if io_prtstatus
+			jsr primm
+			.text @" User port type: \$00"
+		#endif
+		ldx #0
+		lda pio_parport
+	!:	cmp pio_parport
+		bne notfound
+		dex
+		bne !-
+
+		inc userport_type
+		#if io_prtstatus
+			jsr primm
+			.text @"plus/4\$00"
+		#endif
+
+		lda pio_parport
+		cmp ramexpctrl_hannes
+		beq !+
+
+		inc userport_type
+		#if io_prtstatus
+			jsr primm
+			.text @" expanded\$00"
+		#endif
+
+	!:
+		#if io_prtstatus
+			jsr prtcr
+		#endif
+		rts
+	notfound:
+		#if io_prtstatus
+			jsr primm
+			.text @"none\$0d\$00"
+		#endif
+		rts
 	}
 #endif
 
