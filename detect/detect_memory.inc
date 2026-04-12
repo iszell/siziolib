@@ -11,13 +11,34 @@ detect:
 #else
 .label	testaddr	=	$fcff
 	sei
+	lda #0
+	sta hannes_port
+	sta csory_port
 	ldy	#$ff
-// Reset Csory expansion control
-	sty	ramexpctrl_csory
+
+// Detect memory expansion ports
+	ldx #0
+	lda ramexpctrl_hannes
+!:	cmp ramexpctrl_hannes
+	bne nohannes
+	dex
+	bne !-
+	inc hannes_port
 // Reset Hannes expansion control
 	sty	ramexpctrl_hannes
+nohannes:
+	ldx #0
+	lda ramexpctrl_csory
+!:	cmp ramexpctrl_csory
+	bne nocsory
+	dex
+	bne !-
+	inc csory_port
+// Reset Csory expansion control
+	sty	ramexpctrl_csory
+nocsory:
 	iny
-	sty	ted.ramen
+	sta	ted.ramen
 
 // Save and Reset detection address contents
 	lda	testaddr
@@ -117,7 +138,10 @@ detect:
  
 io_detmem_hannes:
 {
-	lda	#0
+	lda hannes_port
+	bne !+
+	rts
+!:	lda	#0
 // Reset address contents in all Hannes memory banks
 // 4M
 	ldx	#%11000000
@@ -179,7 +203,10 @@ io_detmem_hannes:
 // Method: 
 // 1) 
 io_detmem_csory: {
-	// Set Csory expansion to default config: $c000-$ffff= 16k bank 3
+	lda csory_port
+	bne !+
+	rts
+!:	// Set Csory expansion to default config: $c000-$ffff= 16k bank 3
 	ldx	#%11000011
 	stx	ramexpctrl_csory
 	// Turn on Csory expansion on Hannes
@@ -285,7 +312,11 @@ io_detmem_neoram: {
 }
 
 memsize:
-	.byte $0
+	.byte 0
+hannes_port:
+	.byte 0
+csory_port:
+	.byte 0
 io_detmemtemp:
 	.byte	0
 	#if	io_prtstatus

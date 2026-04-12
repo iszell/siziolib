@@ -481,9 +481,9 @@ detect_midi: {
 	lda #>(soundx.midi_data)
 //	ldx #<(acia_base)
 //	lda #>(acia_base)
-	stx addressptr
-	sta addressptr+1
-	jsr detect_acia
+	stx detect_acia.addressptr
+	sta detect_acia.addressptr+1
+	jsr detect_acia.detect_acia_address
 	bcs notfound
 
 	lda #1
@@ -511,74 +511,6 @@ notfound:
 	sec
 	cli
 	rts
-
-	detect_acia: {
-		#if io_prtstatus
-			bit debug_mode
-			bpl !+
-			jsr primm
-			.text @"?MIDI: \$00"
-			lda addressptr+1
-			jsr hexbout
-			lda addressptr
-			jsr hexbout
-			lda #':'
-			jsr chrout
-		!:
-		#endif
-		ldy #(acia.status - acia_base)
-		// reset ACIA
-		sta (addressptr),y
-		// Configure ACIA for No Parity, No Echo, No TX Interrupt, /RTS Low (Unneeded), No RX Interrupt, /DTR Low (Unneeded)
-		lda #$0B
-		ldy #(acia.command-acia_base)
-		sta (addressptr),y
-		// 0 Stop Bits, 8 Data Bits, Internal Baud Rate Generator, 19200 bps (which will actually be 31250 due to 3 MHz xtal)
-		lda #$1F
-		ldy #(acia.control-acia_base)
-		sta (addressptr),y
-
-		ldy #(acia.command-acia_base)
-		lda (addressptr),y
-		#if io_prtstatus
-			bit debug_mode
-			bpl !+
-			pha
-			jsr hexbout
-			jsr prtspace
-			pla
-		!:
-		#endif
-		cmp #$0B
-		bne notfound
-
-		ldy #(acia.control-acia_base)
-		lda (addressptr),y
-		#if io_prtstatus
-			bit debug_mode
-			bpl !+
-			pha
-			jsr hexbout
-			pla
-		!:
-		#endif
-		cmp #$1F
-		bne notfound
-
-		clc
-		.byte BIT_ZP
-	notfound:
-		sec
-		#if io_prtstatus
-			bit debug_mode
-			bpl !+
-			php
-			jsr prtcr
-			plp
-		!:
-		#endif
-		rts
-	}
 }
 #endif
 
