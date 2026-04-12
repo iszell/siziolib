@@ -595,6 +595,14 @@ detect_dac: {
 		lda sid_card_version
 		sta dac_card_version
 		lda #2
+		sta dac_card_type	
+		clc
+		lda sid_1_address
+		adc #$1e
+		sta dac_address
+		lda sid_1_address+1
+		adc #0
+		sta dac_address+1
 		bne found
 	nonae:
 		lda ay_card_type
@@ -606,8 +614,9 @@ detect_dac: {
 		stx dac_address+1
 		lda #4
 		sta dac_card_type
-		bne founddigimoooz
+		bne found
 	nodigimoooz:
+/*
 		lda sid_card_type
 		beq notfound
 		lda sid_solder+$1f
@@ -625,7 +634,10 @@ detect_dac: {
 		lda #1
 		bne found
 	notfound:
+*/
 		sec
+		rts
+/*
 		.byte BIT_ZP
 	found:
 		clc
@@ -648,15 +660,9 @@ detect_dac: {
 	#endif
 		bcc !+
 		rts
-	!:	sta dac_card_type
-		clc
-		lda sid_1_address
-		adc #$1e
-		sta dac_address
-		lda sid_1_address+1
-		adc #0
-		sta dac_address+1
-	founddigimoooz:
+	!:	
+*/
+found:
 	#if io_prtstatus
 		jsr primm
 		.text @"  DAC  \$00"
