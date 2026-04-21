@@ -6,6 +6,10 @@
 
 	.namespace iolib {
 	.namespace detect {
+
+	.label KERNAL_CPU_DIR_INIT_VALUE = $f30c
+	.label KERNAL_CPU_PORT_INIT_VALUE = $f310
+
 detected_hardware:
 	.memblock "Detected hardware data"
 #if io_detect_memory_size
@@ -113,6 +117,10 @@ detected_hardware:
 		.byte 0
 #endif
 #if io_detect_cpu_port
+	// 0: 7501/8501
+	// 1: 6510/8500 with patched KERNAL
+	// 2: 6510/8500 with stock KERNAL
+	// 3: unknown
 	cpu_port_type:
 		.byte 0
 #endif
@@ -157,7 +165,13 @@ detect: {
 !:
 #endif
 #if io_detect_drive
+	#if io_detect_cpu_port
+		lda cpu_port_type
+		cmp #2
+		bcs !+
+	#endif
 	jsr detect_drive.detect
+!:
 #endif
 #if io_detect_emulator
 	jsr detect_emulator
@@ -217,10 +231,10 @@ init: {
 	// C16STM old firmware workaround
 #if HAS_TED
 //	lda #%00001111
-	lda $f30c
+	lda KERNAL_CPU_DIR_INIT_VALUE
 	sta cpu_dir
 //	lda #%00001000
-	lda $f310
+	lda KERNAL_CPU_PORT_INIT_VALUE
 	sta cpu_port
 #endif
 	rts
@@ -315,13 +329,21 @@ init: {
 			#endif
 			lda #1
 			sta cpu_port_type
+			lda KERNAL_CPU_DIR_INIT_VALUE
+			cmp #%00001111
+			bne incompatbile
+			#if io_prtstatus
+				jsr	primm
+				.text	@" without KERNAL\$00"
+			#endif
+			inc cpu_port_type
 			bne incompatbile
 		not6502:
 			#if io_prtstatus
 			jsr	primm
-			.text	@"Unsupported\$00"
+			.text	@"unsupported\$00"
 			#endif
-			lda #2
+			lda #3
 			sta cpu_port_type
 		incompatbile:
 		cpuend:
