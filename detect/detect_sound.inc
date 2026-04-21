@@ -165,6 +165,10 @@ sid_models:
 #if HAS_AY
 detect_ay: {
 .const AY_TEST_DATA = %01011010
+	lda #<digimoooz.ay
+	ldx #>digimoooz.ay
+	sta ay_address
+	stx ay_address+1
 	ldy	#15
 	lda	#0
 !:	sty digimoooz.ay_address
@@ -185,10 +189,6 @@ detect_ay: {
 	stx ay_model
 	lda #2
 	sta ay_card_type
-	lda #<digimoooz.ay
-	ldx #>digimoooz.ay
-	sta ay_address
-	stx ay_address+1
 	ldx #0
 	stx ay_address_offset
 	inx
@@ -197,6 +197,11 @@ detect_ay: {
 	jmp ay_found
 
 nodigimoooz:
+	lda #<ay_base
+	ldx #>ay_base
+	sta ay_address
+	stx ay_address+1
+
 	ldy	#15
 	lda	#0
 !:	sty ay.address
@@ -218,10 +223,6 @@ nodigimoooz:
 !:	stx ay_model
 	lda #1
 	sta ay_card_type
-	lda #<ay_base
-	ldx #>ay_base
-	sta ay_address
-	stx ay_address+1
 	ldx #0
 	stx ay_read_offset
 	inx
@@ -268,6 +269,9 @@ ay_found:
 	.byte BIT_ZP
 noay:
 	sec
+	lda #0
+	sta ay_address
+	sta ay_address+1
 	rts
 
 check_ay: {
@@ -277,6 +281,12 @@ check_ay: {
 		pha
 		jsr primm
 		.text @"?AY: \$00"
+		lda ay_address
+		ldx ay_address+1
+		jsr printaddr
+		lda #':'
+		jsr chrout
+		jsr prtspace
 		pla
 		pha
 		jsr hexbout
