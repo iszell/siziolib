@@ -1,6 +1,7 @@
 	#import "plus4_kernal_table.inc"
+	#import "ted.inc"
 
-	* = $02 virtual
+	* = $d0 virtual
 .zp {
 	
 tmp_zp:
@@ -32,9 +33,12 @@ res_zp:
 	jmp start
 
 sid_map:
+/*
 	.fill	32, 0
 	.fill	32+16, 0
 	.fill	16, 0
+*/
+.fill ($ff00-$fd00)/$20, 0
 .const MAP_LEN	=	*-sid_map
 
 start:
@@ -48,52 +52,52 @@ s_lp0:
 	dex
 	bne	s_lp0
 
-	ldx	#48
 	lda	#$81
-s_lp00:
-	sta	sid_map+32-1,x
-	dex
-	bne	s_lp00
+	sta	sid_map+$00/2,x // do not check at $fd00 to prevent overwriting user port
+	sta	sid_map+$02/2,x // do not check at $fd20 to prevent overwriting speech/digimuz/keyboard
+	sta	sid_map+$0c/2,x // do not check at $fdc0 to prevent overwriting ROM bank
+	sta	sid_map+$1c/2,x // do not check at $fec0 to prevent overwriting TCBM #9
+	sta	sid_map+$1e/2,x // do not check at $fec0 to prevent overwriting TCBM #8
 
-/*
 	sei
 	jsr	check_sid
+//	sta rom_bank_latch // fix potentially overwritten ROM config
 	cli
+	jsr	primm
+	.text 	@"\$0dSID MAP: \$00"
 
-	lda	#<map_msg
-	ldy	#>map_msg
-	jsr	$ab1e
 	ldx	#0
-	ldy	#$d4
+	ldy	#>sid_solder
+//	ldy	#$d4
 s_lp1:
 	txa
 	and	#$7
 	bne	s_skp1
 	lda	#13
-	jsr	$ffd2
-	lda	#$20
-	jsr	$ffd2
+	jsr	chrout
+	lda	#' '
+	jsr	chrout
 	tya
-	jsr	print_hex
+	jsr hexbout
 	lda	#0
-	jsr	print_hex
+	jsr	hexbout
 	iny
 s_skp1:
-	lda	#$20
-	jsr	$ffd2
+	lda	#' '
+	jsr	chrout
 	lda	sid_map,x
 	bpl	s_skp2
 	cmp	#$81
 	bne	s_skp11
-	lda	#"*"
-	dc.b	$2c
+	lda	#'*'
+	.byte BIT_ABS
 s_skp11:
-	lda	#"-"
-	jsr	$ffd2
-	jsr	$ffd2
+	lda	#'-'
+	jsr	chrout
+	jsr	chrout
 	jmp	s_skp3
 s_skp2:
-	jsr	print_hex
+	jsr	hexbout
 s_skp3:
 	inx
 	cpx	#MAP_LEN
@@ -102,95 +106,52 @@ s_skp3:
 	lda	num_sids
 	beq	s_ex1
 
-	lda	#<list_msg
-	ldy	#>list_msg
-	jsr	$ab1e
+	jsr	primm
+	.text @"\$0d\$0dSID LIST: \$0d\$00"
+
 	ldx	#0
 s_lp2:
 	stx	mcnt_zp
-	lda	#$20
-	jsr	$ffd2
+	lda	#' '
+	jsr	chrout
 	lda	sid_list_h,x
-	jsr	print_hex
+	jsr	hexbout
 	lda	sid_list_l,x
-	jsr	print_hex
-	lda	#$20
-	jsr	$ffd2
+	jsr hexbout
+	lda	#' '
+	jsr	chrout
 	lda	sid_list_t,x
 	bne	s_skp4
-	lda	#<newsid_msg
-	ldy	#>newsid_msg
-	jsr	$ab1e
+
+	jsr	primm
+	.text "8580"
+	.byte 0
+
 	jmp	s_skp5
 s_skp4:
 	cmp	#$01
 	bne	s_skp5
-	lda	#<oldsid_msg
-	ldy	#>oldsid_msg
-	jsr	$ab1e
+	jsr	primm
+	.text "6581"
+	.byte 0
 s_skp5:
 	lda	#13
-	jsr	$ffd2
+	jsr	chrout
 	ldx	mcnt_zp
 	inx
 	cpx	num_sids
 	bne	s_lp2
 	
 s_ex1:
-	jmp	$a474
+	rts
 
-map_msg:
-	dc.b	13,"SID MAP: ",0
-list_msg:
-	dc.b	13,13,"SID LIST: ",13,0
-oldsid_msg:
-	dc.b	"6581",0
-newsid_msg:
-	dc.b	"8580",0
-
-;**************************************************************************
-;*
-;* NAME  print_hex
-;*
-;* DESCRIPTION
-;*   output hex byte
-;*
-;******
-print_hex:
-	pha
-	lsr
-	lsr
-	lsr
-	lsr
-	jsr	ph_skp1
-	pla
-	and	#$0f
-ph_skp1:
-	cmp	#$0a
-	bcc	ph_skp2
-; C = 1
-	adc	#"A"-$0a-"0"-1
-ph_skp2:
-; C = 0
-	adc	#"0"
-	jmp	$ffd2
-;	rts
-
-	
-;**************************************************************************
-;*
-;* NAME  check_sid
-;*   
-;* DESCRIPTION
-;*   Check for SID model.
-;*   
-;******
 check_sid:
-	lda	#$00
+	lda	#0
 	sta	num_sids
 	sta	scnt_zp
 	sta	sptr_zp
-	lda	#$d4
+	lda	#$fd
+//	lda	#$d4
 	sta	sptr_zp+1
 	lda	#$10
 	sta	sidnum_zp
@@ -211,8 +172,8 @@ cs_lp11:
 
 	sta	sid_map,y
 	bmi	cs_next
-;******
-;* found new unique sid!
+
+// found new unique sid!
 	pha
 	ora	sidnum_zp
 	sta	sid_map,y
@@ -226,8 +187,7 @@ cs_lp11:
 	sta	sid_list_t,x
 	inc	num_sids
 	
-;******
-;* Scan for and mark mirrors
+// Scan for and mark mirrors
 cs_lp2:
 	ldx	#mptr_zp
 	jsr	add_sid
@@ -250,15 +210,13 @@ cs_skp1:
 	adc	#$10
 	sta	sidnum_zp
 	
-;******
-;* Next sid
+// Next sid
 cs_next:
 	ldx	#sptr_zp
 	jsr	add_sid
 	cpy	#MAP_LEN
 	bne	cs_lp1
 	rts
-
 
 add_sid:
 	clc
@@ -272,6 +230,7 @@ as_ex1:
 	ldy	$02,x
 	rts
 
+/*
 ;**************************************************************************
 ;*
 ;* NAME  sid_print
@@ -281,36 +240,37 @@ as_ex1:
 ;*   We verify twice that three samples count up the correct way.
 ;*   
 ;******
+*/
 sid_print:
 	stx	x_zp
 	sty	y_zp
-; make sure we stay away from the screen area
+// make sure we stay away from the screen area
 sp_lp1:
-	lda	$d012
-	cmp	#45
-	bcs	sp_lp1
-;------
-	inc	$d020
+	lda	ted.rasterlinehi
+	and	#%1
+	beq	sp_lp1
+
+	inc	ted.border
 	lda	#$1b
 	sta	tmp_zp
 	ldx	#2
 sp_lp2:
-	ldy	#$12
+	ldy	#18
 	lda	#$7f
-	sta	(sptr_zp),y	; reset phase using test bit
-	ldy	#$0e
+	sta	(sptr_zp),y	// reset phase using test bit
+	ldy	#14
 	lda	#$20
 	sta	(sptr_zp),y
 	iny
-	sta	(sptr_zp),y	; freq=$2020
-	ldy	#$12
-	sta	(sptr_zp),y	; sawtooth
-	ldy	tmp_zp		; 3
-	lda	(mptr_zp),y	; 5  =8
-	sta	buf_zp+0	; 3
-	lda	(mptr_zp),y	; 5  =8
-	sta	buf_zp+1	; 3
-	lda	(mptr_zp),y	; 5  =8
+	sta	(sptr_zp),y	// freq=$2020
+	ldy	#18
+	sta	(sptr_zp),y	// sawtooth
+	ldy	tmp_zp		// 3
+	lda	(mptr_zp),y	// 5  =8
+	sta	buf_zp+0	// 3
+	lda	(mptr_zp),y	// 5  =8
+	sta	buf_zp+1	// 3
+	lda	(mptr_zp),y	// 5  =8
 	tay
 	lda	#$80
 	dey
@@ -326,29 +286,22 @@ sp_lp2:
 sp_fl1:
 	pha
 
-	ldy	#$12
+	ldy	#18
 	lda	#$00
-	sta	(sptr_zp),y	; disable oscillator
+	sta	(sptr_zp),y	// disable oscillator
 
-; Acc = first sample
-	dec	$d020
+// Acc = first sample
+	dec	ted.border
 	ldx	x_zp
 	ldy	y_zp
-	pla			; make sure flags are set up
+	pla			// make sure flags are set up
 	rts
-	echo	.
 
-*/
-
-/*
 num_sids:
-	ds.b	1
+	.byte 0
 sid_list_l:
-	ds.b	8
+	.fill 8, 0
 sid_list_h:
-	ds.b	8
+	.fill 8, 0
 sid_list_t:
-	ds.b	8
-	
-; eof
-*/
+	.fill 8, 0
