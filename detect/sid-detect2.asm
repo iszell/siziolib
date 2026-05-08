@@ -67,8 +67,8 @@ s_lp0:
 	.text 	@"\$0dSID MAP: \$00"
 
 	ldx	#0
-	ldy	#>sid_solder
 //	ldy	#$d4
+	ldy	#$fd
 s_lp1:
 	txa
 	and	#$7
@@ -150,8 +150,8 @@ check_sid:
 	sta	num_sids
 	sta	scnt_zp
 	sta	sptr_zp
-	lda	#$fd
 //	lda	#$d4
+	lda	#$fd
 	sta	sptr_zp+1
 	lda	#$10
 	sta	sidnum_zp
@@ -159,10 +159,10 @@ check_sid:
 cs_lp1:
 	ldx	#3
 cs_lp11:
-	lda	sptr_zp-1,x
-	sta	mptr_zp-1,x
+	lda	sptr_zp,x
+	sta	mptr_zp,x
 	dex
-	bne	cs_lp11
+	bpl	cs_lp11
 
 	ldy	scnt_zp
 	lda	sid_map,y
@@ -244,12 +244,17 @@ as_ex1:
 sid_print:
 	stx	x_zp
 	sty	y_zp
+// switch to single clock
+	lda ted.charsetaddr
+	ora #%10
+	sta ted.charsetaddr
 // make sure we stay away from the screen area
 sp_lp1:
 	lda	ted.rasterlinehi
 	and	#%1
 	beq	sp_lp1
 
+.byte $f2
 	inc	ted.border
 	lda	#$1b
 	sta	tmp_zp
@@ -292,6 +297,10 @@ sp_fl1:
 
 // Acc = first sample
 	dec	ted.border
+// switch back to double clock
+	lda ted.charsetaddr
+	and #~%10
+	sta ted.charsetaddr
 	ldx	x_zp
 	ldy	y_zp
 	pla			// make sure flags are set up
