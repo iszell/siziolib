@@ -523,8 +523,16 @@ readstatus: {
 !:	dex
 	bne !-
 	#if HAS_TED
+		lda cpu_port_type
+		bne !cpu6510+
 	!:	bit cpu_port
 		bpl !-
+		bmi !endwait+
+	!cpu6510:
+		lda #%00000001
+	!:	bit cpu_port
+		beq !-
+	!endwait:
 	#endif
 	ldx	currdrive
 	lda	#15
