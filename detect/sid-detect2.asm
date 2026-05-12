@@ -33,13 +33,8 @@ res_zp:
 	jmp start
 
 sid_map:
-/*
-	.fill	32, 0
-	.fill	32+16, 0
-	.fill	16, 0
-*/
-.fill ($ff00-$fd00)/$20, 0
-.const MAP_LEN	=	*-sid_map
+	.const MAP_LEN = ($ff00-$fd00)/$20
+	.fill MAP_LEN, 0
 
 start:
 	jsr primm
@@ -61,13 +56,11 @@ s_lp0:
 
 	sei
 	jsr	check_sid
-//	sta rom_bank_latch // fix potentially overwritten ROM config
 	cli
 	jsr	primm
 	.text 	@"\$0dSID MAP: \$00"
 
 	ldx	#0
-//	ldy	#$d4
 	ldy	#$fd
 s_lp1:
 	txa
@@ -150,7 +143,6 @@ check_sid:
 	sta	num_sids
 	sta	scnt_zp
 	sta	sptr_zp
-//	lda	#$d4
 	lda	#$fd
 	sta	sptr_zp+1
 	lda	#$10
@@ -247,16 +239,15 @@ sid_print:
 // switch to single clock
 	lda ted.charsetaddr
 	ora #%10
-	sta ted.charsetaddr
+//	sta ted.charsetaddr
 // make sure we stay away from the screen area
 sp_lp1:
 	lda	ted.rasterlinehi
 	and	#%1
 	beq	sp_lp1
 
-.byte $f2
 	inc	ted.border
-	lda	#$1b
+	lda	#27
 	sta	tmp_zp
 	ldx	#2
 sp_lp2:
@@ -264,17 +255,21 @@ sp_lp2:
 	lda	#$7f
 	sta	(sptr_zp),y	// reset phase using test bit
 	ldy	#14
-	lda	#$20
+	lda	#$10
 	sta	(sptr_zp),y
 	iny
 	sta	(sptr_zp),y	// freq=$2020
 	ldy	#18
+	lda	#$20
 	sta	(sptr_zp),y	// sawtooth
 	ldy	tmp_zp		// 3
+	.for(var i=0; i<6; i++) nop //2*6
 	lda	(mptr_zp),y	// 5  =8
 	sta	buf_zp+0	// 3
+	.for(var i=0; i<7; i++) nop //2*6
 	lda	(mptr_zp),y	// 5  =8
 	sta	buf_zp+1	// 3
+	.for(var i=0; i<9; i++) nop //2*6
 	lda	(mptr_zp),y	// 5  =8
 	tay
 	lda	#$80
@@ -285,7 +280,7 @@ sp_lp2:
 	cpy	buf_zp+0
 	bne	sp_fl1
 	dex
-	bne	sp_lp2
+//	bne	sp_lp2
 
 	tya
 sp_fl1:
