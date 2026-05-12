@@ -187,9 +187,9 @@ foundsid:
 		jsr detect_sid_address
 		bcs notfound
 		
-		lda #%01111111
+		lda #%01111111		// stop SID 2 oscillator 3
 		sta sid_csory+18
-		lda #%00100000
+		lda #%00100000		// start sawtooth on oscillator 3 on SID 1
 		sta sid_solder+14
 		sta sid_solder+15
 		sta sid_solder+18
@@ -211,6 +211,9 @@ foundsid:
 	!:	stx sid_2_model
 
 	notfound:
+		lda #0
+		sta sid_solder+18	// turn off oscillator 3 on both SIDs
+		sta sid_csory+18
 		rts
 	}
 
