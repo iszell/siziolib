@@ -40,12 +40,14 @@ detect:
 		.text	@" Detected devices:\$0d\$00"
 	#endif
 	jsr	io_detectdrvtp
+#if	need_loader
 	#if	io_prtstatus
 		jsr	primm
 		.text	@" Using drive #\$00"
 		jsr	io_prtdrivenum
 		jsr	prtcr
 	#endif
+#endif
 	plp
 	rts
 	

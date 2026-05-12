@@ -89,10 +89,10 @@ foundsid:
 	#if !HAS_TED
 		lda #1
 		sta sid_card_type
-	#endif
-	#if HAS_TED
+	#else
 		lda #2
 		sta sid_card_type
+		jsr detect_2nd_sid
 		jsr detect_nae
 		beq nonae
 		inc sid_card_type
@@ -107,8 +107,8 @@ foundsid:
 	!:
 		jsr primm
 		.text @"  SID  \$00"
-		lda sidptr
-		ldx sidptr+1
+		lda sid_1_address
+		ldx sid_1_address+1
 		jsr printaddr
 		lda sid_1_model
 		asl
@@ -120,6 +120,25 @@ foundsid:
 		inx
 		dey
 		bne !-
+
+		lda sid_2_model
+		beq no2ndsid
+		jsr primm
+		.text @"\$0d       \$00"
+		lda sid_2_address
+		ldx sid_2_address+1
+		jsr printaddr
+		lda sid_2_model
+		asl
+		asl
+		tax
+		ldy #4
+	!:	lda sid_models-4,x
+		jsr chrout
+		inx
+		dey
+		bne !-
+	no2ndsid:
 		#if HAS_TED
 			lda sid_card_type
 			cmp #3
@@ -156,6 +175,44 @@ foundsid:
 		jsr prtcr
 	#endif
 	rts
+	
+	detect_2nd_sid: {
+		lda sidptr
+		cmp #<sid_solder
+		bne notfound
+		lda #<sid_csory
+		ldx #>sid_csory
+		sta sidptr
+		stx sidptr+1
+		jsr detect_sid_address
+		bcs notfound
+		
+		lda #%01111111
+		sta sid_csory+18
+		lda #%00100000
+		sta sid_solder+14
+		sta sid_solder+15
+		sta sid_solder+18
+		ldx #64
+		lda sid_csory+27
+	!:	cmp sid_csory+27
+		bne notfound
+		dex
+		bne !-
+		
+		lda sidptr
+		ldx sidptr+1
+		sta sid_2_address
+		stx sid_2_address+1
+		jsr detect_sid_model
+		ldx #1
+		bcs !+
+		inx
+	!:	stx sid_2_model
+
+	notfound:
+		rts
+	}
 
 sid_models:
 	.text	"6581"
