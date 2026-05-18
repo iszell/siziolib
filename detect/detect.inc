@@ -378,14 +378,14 @@ init: {
 		bne notfound
 		dex
 		bne !-
-
 		inc userport_type
 		#if io_prtstatus
 			jsr primm
 			.text @"plus/4\$00"
 		#endif
 
-		lda pio_parport
+		lda #0
+		sta pio_parport
 		cmp ramexpctrl_hannes
 		beq !+
 
