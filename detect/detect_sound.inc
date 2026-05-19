@@ -481,9 +481,9 @@ detect_midi: {
 	lda #>(soundx.midi_data)
 //	ldx #<(acia_base)
 //	lda #>(acia_base)
-	stx detect_acia.addressptr
-	sta detect_acia.addressptr+1
-	jsr detect_acia.detect_acia_address
+	stx iolib.detect.detect_acia.addressptr
+	sta iolib.detect.detect_acia.addressptr+1
+	jsr iolib.detect.detect_acia.detect_acia_address
 	bcs notfound
 
 	lda #1
@@ -751,6 +751,8 @@ notfound:
 !:	rts
 }
 #endif
+
+#import "detect_acia.inc"
 
 #if io_prtstatus
 	printaddr: {
