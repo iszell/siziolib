@@ -10,7 +10,7 @@
 	.label addressptr	= 2
 #if io_detect_acia
 	detect: {
-
+	#if HAS_ACIA
 		lda #<acia_base
 		ldx #>acia_base
 		sta addressptr
@@ -22,10 +22,12 @@
 			jsr primm
 			.text @" ACIA detected\$0d\$00"
 		#endif
+	#endif
 	!:	rts
 	}
 #endif
 
+#if HAS_ACIA
 	detect_acia_address: {
 		#if io_prtstatus
 			bit debug_mode
@@ -93,6 +95,7 @@
 		#endif
 		rts
 	}
+#endif
 }
 }
 }

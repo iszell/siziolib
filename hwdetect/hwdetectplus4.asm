@@ -18,6 +18,8 @@
 	#define io_detect_memory_size
 	#define io_detect_sound
 	#define io_detect_drive
+	#define io_detect_acia
+	#define io_detect_userport
 	#define io_detect_emulator
 //	#define io_halt_on_vice
 	#define io_detect_cpu_port

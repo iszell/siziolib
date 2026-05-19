@@ -8,15 +8,13 @@
 	.namespace detect {
 detected_hardware:
 	.memblock "Detected hardware data"
-#if HAS_ACIA && (io_detect_memory_size || io_detect_drive)
-	#define io_detect_acia
+#if io_detect_acia
 	// 0: not present
 	// 1: 6551 or compatible
 	acia_type:
 		.byte	0
 #endif
-#if HAS_TED && (io_detect_memory_size || io_detect_drive)
-	#define io_detect_userport
+#if io_detect_userport
 	// 0: not present
 	// 1: 6529 or compatible on full address range
 	// 2: 6529 or compatible at $fd10 only
@@ -55,65 +53,65 @@ detected_hardware:
 		.byte 0
 	sid_2_address:
 		.word 0
-#if HAS_AY
-	// 0: none
-	// 1: DIGIMUZ
-	// 2: DigiMoooZ
-	ay_card_type:
-		.byte 0
-	// 0: none
-	// 1: AY-3-891x
-	// 2: YM2149
-	ay_model:
-		.byte 0
-	ay_address:
-		.word 0
-	ay_address_offset:
-		.byte 0
-	ay_read_offset:
-		.byte 0
-	ay_write_offset:
-		.byte 0
-#endif
-#if HAS_FM
-	// 0: none
-	// 1: Commodore Sound Expander
-	// 2: SideKick
-	// 3: SoundX
-	fm_card_type:
-		.byte 0
-	// 0: none
-	// 1: OPL/OPL-II
-	fm_model:
-		.byte 0
-	fm_address:
-		.word 0
-	fm_data_offset:
-		.byte 0
-	fm_status_offset:
-		.byte 0
-#endif
-#if HAS_MIDI
-	// 0: none
-	// 1: SoundX
-	midi_card_type:
-		.byte 0
-	midi_address:
-		.word 0
-#endif
-#if HAS_DAC
-	// 0: none
-	// 1: DigiBlaster
-	// 2: NAE/CAE
-	// 3: ReVox
-	// 4: DigiMoooZ
-	dac_card_type:
-		.byte 0
-	dac_card_version:
-		.byte 0
-	dac_address:
-		.word 0
-#endif
+	#if HAS_AY
+		// 0: none
+		// 1: DIGIMUZ
+		// 2: DigiMoooZ
+		ay_card_type:
+			.byte 0
+		// 0: none
+		// 1: AY-3-891x
+		// 2: YM2149
+		ay_model:
+			.byte 0
+		ay_address:
+			.word 0
+		ay_address_offset:
+			.byte 0
+		ay_read_offset:
+			.byte 0
+		ay_write_offset:
+			.byte 0
+	#endif
+	#if HAS_FM
+		// 0: none
+		// 1: Commodore Sound Expander
+		// 2: SideKick
+		// 3: SoundX
+		fm_card_type:
+			.byte 0
+		// 0: none
+		// 1: OPL/OPL-II
+		fm_model:
+			.byte 0
+		fm_address:
+			.word 0
+		fm_data_offset:
+			.byte 0
+		fm_status_offset:
+			.byte 0
+	#endif
+	#if HAS_MIDI
+		// 0: none
+		// 1: SoundX
+		midi_card_type:
+			.byte 0
+		midi_address:
+			.word 0
+	#endif
+	#if HAS_DAC
+		// 0: none
+		// 1: DigiBlaster
+		// 2: NAE/CAE
+		// 3: ReVox
+		// 4: DigiMoooZ
+		dac_card_type:
+			.byte 0
+		dac_card_version:
+			.byte 0
+		dac_address:
+			.word 0
+	#endif
 #endif
 #if io_detect_drive
 	drive_number:
@@ -139,6 +137,7 @@ detected_hardware:
 	debug_mode:
 		.byte 0
 #endif
+
 detect: {
 #if io_prtstatus
 	jsr primm
@@ -228,11 +227,11 @@ init: {
 		lda #-1
 		.byte BIT_ABS
 	nodebug:
-#if DEBUG_DETECT
-		lda #-1
-#else
-		lda #0
-#endif
+		#if DEBUG_DETECT
+			lda #-1
+		#else
+			lda #0
+		#endif
 		sta debug_mode
 	#endif
 	// C16STM old firmware workaround
@@ -253,19 +252,19 @@ init: {
 			#if io_prtstatus
 				jsr primm
 				.text @" Video standard: \$00"
-			lda ted.ctrl2
-			and #%01000000
-			lsr
-			lsr
-			lsr
-			tax
-			ldy #4
-		!:	lda video_standard_name,x
-			jsr chrout
-			inx
-			dey
-			bne !-
-			jsr prtcr
+				lda ted.ctrl2
+				and #%01000000
+				lsr
+				lsr
+				lsr
+				tax
+				ldy #4
+			!:	lda video_standard_name,x
+				jsr chrout
+				inx
+				dey
+				bne !-
+				jsr prtcr
 			#endif
 	#endif
 	rts
@@ -377,15 +376,15 @@ init: {
 			bne incompatbile
 		not6502:
 			#if io_prtstatus
-			jsr	primm
-			.text	@"Unsupported\$00"
+				jsr	primm
+				.text	@"Unsupported\$00"
 			#endif
 			lda #2
 			sta cpu_port_type
 		incompatbile:
 		cpuend:
 			#if io_prtstatus
-			jsr prtcr
+				jsr prtcr
 			#endif
 			pla
 			sta cpu_port
@@ -444,6 +443,7 @@ prtcr: {
 #endif
 #if io_detect_memory_size
 	#import "detect_memory.inc"
+#endif
 #if io_detect_sound
 	#import "detect_sound.inc"
 #endif
