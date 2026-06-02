@@ -26,6 +26,8 @@ quit:
 		.label  io_loadptr  = $9e
 		.label  io_loadflag = $9d
 	}
+
+// Print IOLib status messages
 //	#define io_prtstatus
 // Detect video standard. Not really useful except for printing status message
 //	#define io_detect_video

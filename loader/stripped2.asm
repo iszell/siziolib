@@ -55,7 +55,7 @@ end:
 // Detect VICE xplus4 and optionally halt when detected
 //	#define io_detect_emulator
 //	#define io_halt_on_vice
-// Detect CPU to get rid of 6510to7501 adapters
+// Detect CPU to get rid of 6510to7501 adapters for serial loaders
 	#define io_detect_cpu_port
 // Halt CPU when 6510 and serial drive detected 
 	#define io_halt_on_6510

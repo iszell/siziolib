@@ -1,3 +1,4 @@
+.idea/*
 ByteDump.txt
 *.prg
 *.d64
@@ -8,6 +9,5 @@ ByteDump.txt
 *.log
 *.sym
 *.bak
-make
 !sd2iec/*
 !testdisk.d*

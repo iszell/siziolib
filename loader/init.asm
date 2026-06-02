@@ -38,6 +38,7 @@ error:
 	rts
 }
 
+// Print IOLib status messages
 //	#define io_prtstatus
 // Detect video standard. Not really useful except for printing status message
 //	#define io_detect_video
