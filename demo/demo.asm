@@ -369,13 +369,18 @@ runsec:
 	#define io_detect_memory_size
 // Detect available sound expansions including SID type and address
 	#define io_detect_sound
+// Detect if ACIA is present
+//	#define io_detect_acia
+// Detect user port type for parallel drive interface
+	#define io_detect_userport
+// Detect all drives and select last used drive for loader (#8 if device number is less than 8)
 	#define io_detect_drive
 // Detect VICE xplus4 and optionally halt when detected
 //	#define io_detect_emulator
 //	#define io_halt_on_vice
-// Detect CPU to get rid of 6502to7501 adapters
+// Detect CPU to get rid of 6510to7501 adapters
 	#define io_detect_cpu_port
-	#define io_halt_on_6502
+	#define io_halt_on_6510
 
 // Include loader code (drive detection and loader)
 	#define need_loader
