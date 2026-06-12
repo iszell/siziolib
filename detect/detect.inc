@@ -69,10 +69,12 @@ detected_hardware:
 	// 1: Commodore Sound Expander
 	// 2: SideKick
 	// 3: SoundX
+	// 4: YaPE
 	fm_card_type:
 		.byte 0
 	// 0: none
 	// 1: OPL/OPL-II
+	// 2: OPL3
 	fm_model:
 		.byte 0
 	fm_address:

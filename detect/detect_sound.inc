@@ -328,20 +328,22 @@ detect_fm: {
 	stx statusptr
 	sta statusptr+1
 	jsr detect_opl
-	#if HAS_TED
-		bcs !+
+	#if !HAS_TED
+		bcc !+
+		jmp notfound
+	!:	lda #1
+		ldx #$10
+		ldy #$20
+	#else
+		bcs nosidekickfm
 		lda #2
 		ldx #1
 		ldy #2
-		bne found
-	#else
-		bcs notfound
-		lda #1
-		ldx #$10
-		ldy #$20
-	#endif
-	#if HAS_TED
-	!:	ldx #<(soundx.address)
+		sta fm_card_type
+		stx fm_data_offset
+		sty fm_status_offset
+	nosidekickfm:
+		ldx #<(soundx.address)
 		lda #>(soundx.address)
 		stx addressptr
 		sta addressptr+1
@@ -352,8 +354,15 @@ detect_fm: {
 		stx statusptr
 		sta statusptr+1
 		jsr detect_opl
-		bcs notfound
-		lda #3
+		bcc !+
+		lda fm_card_type
+		beq !++
+		jmp notfound
+	!:	lda fm_card_type
+		beq !+
+		lda #4
+		.byte BIT_ABS
+	!:	lda #3
 		ldx #1
 		ldy #0
 	#endif
@@ -361,7 +370,11 @@ found:
 	sta fm_card_type
 	stx fm_data_offset
 	sty fm_status_offset
-	lda #1
+	cmp #4
+	bne !+
+	lda #2
+	.byte BIT_ABS
+!:	lda #1
 	sta fm_model
 	lda addressptr
 	ldx addressptr+1
@@ -373,9 +386,15 @@ found:
 		lda fm_address
 		ldx fm_address+1
 		jsr printaddr
+		lda fm_card_type
+		cmp #4
+		bne !+
 		jsr primm
+		.text @"OPL3, \$00"
+		jmp !++
+	!:	jsr primm
 		.text @"OPL/OPL-II, \$00"
-		ldx fm_card_type
+	!:	ldx fm_card_type
 		dex
 		bne !+
 		jsr primm
@@ -386,8 +405,13 @@ found:
 		jsr primm
 		.text @"SideKick\$00"
 		jmp foundend
-	!:	jsr primm
+	!:	dex
+		bne !+
+		jsr primm
 		.text @"SoundX\$00"
+		jmp foundend
+	!:	jsr primm
+		.text @"YaPE\$00"
 foundend:
 		jsr prtcr
 	#endif
