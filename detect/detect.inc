@@ -359,19 +359,40 @@ init: {
 	.memblock "CPU I/O port type detection"
 	detect_cpu_port_type: {
 		#if HAS_TED
+			#if io_prtstatus
+				bit debug_mode
+				bpl !+
+				jsr primm
+				.text @"?CPU: \$00"
+			!:
+			#endif
 			lda cpu_port
 			pha
+			and #~%00000001
+			sta cpu_port
+			#if io_prtstatus
+				bit debug_mode
+				bpl !+
+				jsr hexbout
+				jsr prtspace
+			!:
+			#endif
+			lda cpu_port
+			#if io_prtstatus
+				pha
+				bit debug_mode
+				bpl !+
+				jsr hexbout
+				jsr prtcr
+			!:	pla
+			#endif
+			bpl not7501
+			ora #%00000001
+			sta cpu_port
 			#if	io_prtstatus
 				jsr	primm
 				.text	@" CPU port type: \$00"
 			#endif
-			lda cpu_port
-			and #~%00000001
-			sta cpu_port
-			bit cpu_port
-			bpl not7501
-			ora #%00000001
-			sta cpu_port
 			bit cpu_port
 			bmi not7501
 			and #%00100000
@@ -385,6 +406,17 @@ init: {
 			sta cpu_dir
 			lda cpu_dir
 			and #%00100000
+			#if io_prtstatus
+				php
+				bit debug_mode
+				bpl !+
+				jsr primm
+				.byte $91, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, 0
+				jsr hexbout
+				jsr primm
+				.byte $11, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, 0
+			!:	plp
+			#endif
 			beq not6502plus4
 			#if io_prtstatus
 				jsr	primm
@@ -400,6 +432,17 @@ init: {
 			sta cpu_port
 			lda cpu_port
 			and #%00100000
+			#if io_prtstatus
+				php
+				bit debug_mode
+				bpl !+
+				jsr primm
+				.byte $91, $9d, $9d, $9d, $9d, 0
+				jsr hexbout
+				jsr primm
+				.byte $11, $1d, $1d, 0
+			!:	plp
+			#endif
 			beq not6502
 			#if io_prtstatus
 				jsr	primm
