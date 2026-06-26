@@ -279,26 +279,56 @@ init: {
 	.print ". User port detection"
 	.memblock "User port detection"
 	detect_userport: {
-		#if io_prtstatus
-			jsr primm
-			.text @" User port type: \$00"
-		#endif
 		ldx #0
 		lda pio_parport
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			pha
+			jsr primm
+			.text @"?PIO: \$00"
+			pla
+			pha
+			jsr hexbout
+			jsr prtspace
+			pla
+		!:
+		#endif
 	!:	cmp pio_parport
 		bne notfound
 		dex
 		bne !-
-		inc userport_type
 		#if io_prtstatus
-			jsr primm
-			.text @"plus/4\$00"
+			bit debug_mode
+			bpl !+
+			pha
+			jsr hexbout
+			jsr prtspace
+			pla
+		!:
 		#endif
+		inc userport_type
 
 		lda #0
 		sta pio_parport
 		cmp ramexpctrl_hannes
-		beq !+
+		php
+
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			lda ramexpctrl_hannes
+			jsr hexbout
+			jsr prtcr
+		!:
+		#endif
+		#if io_prtstatus
+			jsr primm
+			.text @" User port type: plus/4\$00"
+		#endif
+
+		plp
+		beq nohannes
 
 		inc userport_type
 		#if io_prtstatus
@@ -306,15 +336,19 @@ init: {
 			.text @" expanded\$00"
 		#endif
 
-	!:
+	nohannes:
 		#if io_prtstatus
 			jsr prtcr
 		#endif
 		rts
 	notfound:
 		#if io_prtstatus
-			jsr primm
-			.text @"none\$0d\$00"
+			bit debug_mode
+			bpl !+
+			jsr hexbout
+			jsr prtspace
+			jsr prtcr
+		!:
 		#endif
 		rts
 	}
