@@ -162,6 +162,9 @@ detect: {
 #if io_detect_userport
 	jsr detect_userport
 #endif
+#if io_detect_cpu_port
+	jsr detect_cpu_port_type
+#endif
 #if io_detect_memory_size
 	jsr detect_memory_size.detect
 #endif
