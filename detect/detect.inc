@@ -12,6 +12,19 @@
 
 detected_hardware:
 	.memblock "Detected hardware data"
+#if io_detect_acia
+	// 0: not present
+	// 1: 6551 or compatible
+	acia_type:
+		.byte	0
+#endif
+#if io_detect_userport
+	// 0: not present
+	// 1: 6529 or compatible on full address range
+	// 2: 6529 or compatible at $fd10 only
+	userport_type:
+		.byte	0
+#endif
 #if io_detect_memory_size
 	// 0: Stock
 	// 1: Hannes
@@ -44,67 +57,65 @@ detected_hardware:
 		.byte 0
 	sid_2_address:
 		.word 0
-#if HAS_AY
-	// 0: none
-	// 1: DIGIMUZ
-	// 2: DigiMoooZ
-	ay_card_type:
-		.byte 0
-	// 0: none
-	// 1: AY-3-891x
-	// 2: YM2149
-	ay_model:
-		.byte 0
-	ay_address:
-		.word 0
-	ay_address_offset:
-		.byte 0
-	ay_read_offset:
-		.byte 0
-	ay_write_offset:
-		.byte 0
-#endif
-#if HAS_FM
-	// 0: none
-	// 1: Commodore Sound Expander
-	// 2: SideKick
-	// 3: SoundX
-	// 4: YaPE
-	fm_card_type:
-		.byte 0
-	// 0: none
-	// 1: OPL/OPL-II
-	// 2: OPL3
-	fm_model:
-		.byte 0
-	fm_address:
-		.word 0
-	fm_data_offset:
-		.byte 0
-	fm_status_offset:
-		.byte 0
-#endif
-#if HAS_MIDI
-	// 0: none
-	// 1: SoundX
-	midi_card_type:
-		.byte 0
-	midi_address:
-		.word 0
-#endif
-#if HAS_DAC
-	// 0: none
-	// 1: DigiBlaster
-	// 2: NAE/CAE
-	// 3: ReVox
-	// 4: DigiMoooZ
-	dac_card_type:
-		.byte 0
-	dac_card_version:
-		.byte 0
-	dac_address:
-		.word 0
-#endif
+	#if HAS_AY
+		// 0: none
+		// 1: DIGIMUZ
+		// 2: DigiMoooZ
+		ay_card_type:
+			.byte 0
+		// 0: none
+		// 1: AY-3-891x
+		// 2: YM2149
+		ay_model:
+			.byte 0
+		ay_address:
+			.word 0
+		ay_address_offset:
+			.byte 0
+		ay_read_offset:
+			.byte 0
+		ay_write_offset:
+			.byte 0
+	#endif
+	#if HAS_FM
+		// 0: none
+		// 1: Commodore Sound Expander
+		// 2: SideKick
+		// 3: SoundX
+		fm_card_type:
+			.byte 0
+		// 0: none
+		// 1: OPL/OPL-II
+		fm_model:
+			.byte 0
+		fm_address:
+			.word 0
+		fm_data_offset:
+			.byte 0
+		fm_status_offset:
+			.byte 0
+	#endif
+	#if HAS_MIDI
+		// 0: none
+		// 1: SoundX
+		midi_card_type:
+			.byte 0
+		midi_address:
+			.word 0
+	#endif
+	#if HAS_DAC
+		// 0: none
+		// 1: DigiBlaster
+		// 2: NAE/CAE
+		// 3: ReVox
+		// 4: DigiMoooZ
+		dac_card_type:
+			.byte 0
+		dac_card_version:
+			.byte 0
+		dac_address:
+			.word 0
+	#endif
 #endif
 #if io_detect_drive
 	drive_number:
@@ -134,6 +145,7 @@ detected_hardware:
 	debug_mode:
 		.byte 0
 #endif
+
 detect: {
 #if io_prtstatus
 	jsr primm
@@ -143,6 +155,12 @@ detect: {
 
 #if io_detect_video
 	jsr detect_video_standard
+#endif
+#if io_detect_acia
+	jsr detect_acia.detect
+#endif
+#if io_detect_userport
+	jsr detect_userport
 #endif
 #if io_detect_cpu_port
 	jsr detect_cpu_port_type
@@ -223,11 +241,11 @@ init: {
 		lda #-1
 		.byte BIT_ABS
 	nodebug:
-#if DEBUG_DETECT
-		lda #-1
-#else
-		lda #0
-#endif
+		#if DEBUG_DETECT
+			lda #-1
+		#else
+			lda #0
+		#endif
 		sta debug_mode
 	#endif
 	// C16STM old firmware workaround
@@ -250,19 +268,19 @@ init: {
 			#if io_prtstatus
 				jsr primm
 				.text @" Video standard: \$00"
-			lda ted.ctrl2
-			and #%01000000
-			lsr
-			lsr
-			lsr
-			tax
-			ldy #4
-		!:	lda video_standard_name,x
-			jsr chrout
-			inx
-			dey
-			bne !-
-			jsr prtcr
+				lda ted.ctrl2
+				and #%01000000
+				lsr
+				lsr
+				lsr
+				tax
+				ldy #4
+			!:	lda video_standard_name,x
+				jsr chrout
+				inx
+				dey
+				bne !-
+				jsr prtcr
 			#endif
 	#endif
 	rts
@@ -270,6 +288,85 @@ init: {
 		video_standard_name:
 			.text "PAL NTSC"
 	#endif
+	}
+#endif
+
+#if io_detect_userport
+	.print ". User port detection"
+	.memblock "User port detection"
+	detect_userport: {
+		ldx #0
+		lda pio_parport
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			pha
+			jsr primm
+			.text @"?PIO: \$00"
+			pla
+			pha
+			jsr hexbout
+			jsr prtspace
+			pla
+		!:
+		#endif
+	!:	cmp pio_parport
+		bne notfound
+		dex
+		bne !-
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			pha
+			jsr hexbout
+			jsr prtspace
+			pla
+		!:
+		#endif
+		inc userport_type
+
+		lda #0
+		sta pio_parport
+		cmp ramexpctrl_hannes
+		php
+
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			lda ramexpctrl_hannes
+			jsr hexbout
+			jsr prtcr
+		!:
+		#endif
+		#if io_prtstatus
+			jsr primm
+			.text @" User port type: plus/4\$00"
+		#endif
+
+		plp
+		beq nohannes
+
+		inc userport_type
+		#if io_prtstatus
+			jsr primm
+			.text @" expanded\$00"
+		#endif
+
+	nohannes:
+		#if io_prtstatus
+			jsr prtcr
+		#endif
+		rts
+	notfound:
+		#if io_prtstatus
+			bit debug_mode
+			bpl !+
+			jsr hexbout
+			jsr prtspace
+			jsr prtcr
+		!:
+		#endif
+		rts
 	}
 #endif
 
@@ -283,19 +380,40 @@ init: {
 	.memblock "CPU I/O port type detection"
 	detect_cpu_port_type: {
 		#if HAS_TED
+			#if io_prtstatus
+				bit debug_mode
+				bpl !+
+				jsr primm
+				.text @"?CPU: \$00"
+			!:
+			#endif
 			lda cpu_port
 			pha
+			and #~%00000001
+			sta cpu_port
+			#if io_prtstatus
+				bit debug_mode
+				bpl !+
+				jsr hexbout
+				jsr prtspace
+			!:
+			#endif
+			lda cpu_port
+			#if io_prtstatus
+				pha
+				bit debug_mode
+				bpl !+
+				jsr hexbout
+				jsr prtcr
+			!:	pla
+			#endif
+			bpl not7501
+			ora #%00000001
+			sta cpu_port
 			#if	io_prtstatus
 				jsr	primm
 				.text	@" CPU port type: \$00"
 			#endif
-			lda cpu_port
-			and #~%00000001
-			sta cpu_port
-			bit cpu_port
-			bpl not7501
-			ora #%00000001
-			sta cpu_port
 			bit cpu_port
 			bmi not7501
 			and #%00100000
@@ -309,6 +427,17 @@ init: {
 			sta cpu_dir
 			lda cpu_dir
 			and #%00100000
+			#if io_prtstatus
+				php
+				bit debug_mode
+				bpl !+
+				jsr primm
+				.byte $91, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, $9d, 0
+				jsr hexbout
+				jsr primm
+				.byte $11, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, $1d, 0
+			!:	plp
+			#endif
 			beq not6502plus4
 			#if io_prtstatus
 				jsr	primm
@@ -324,6 +453,17 @@ init: {
 			sta cpu_port
 			lda cpu_port
 			and #%00100000
+			#if io_prtstatus
+				php
+				bit debug_mode
+				bpl !+
+				jsr primm
+				.byte $91, $9d, $9d, $9d, $9d, 0
+				jsr hexbout
+				jsr primm
+				.byte $11, $1d, $1d, 0
+			!:	plp
+			#endif
 			beq not6502
 			#if io_prtstatus
 				jsr	primm
@@ -342,15 +482,15 @@ init: {
 			bne incompatbile
 		not6502:
 			#if io_prtstatus
-			jsr	primm
-			.text	@"unsupported\$00"
+				jsr	primm
+				.text	@"unsupported\$00"
 			#endif
 			lda #3
 			sta cpu_port_type
 		incompatbile:
 		cpuend:
 			#if io_prtstatus
-			jsr prtcr
+				jsr prtcr
 			#endif
 			pla
 			sta cpu_port
@@ -404,6 +544,9 @@ prtcr: {
 }
 #endif
 
+#if io_detect_acia
+	#import "detect_acia.inc"
+#endif
 #if io_detect_memory_size
 	#import "detect_memory.inc"
 #endif

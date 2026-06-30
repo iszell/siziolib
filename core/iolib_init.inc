@@ -18,7 +18,7 @@ init:
 	bne notserial
 	lda iolib.detect.cpu_port_type
 	beq notserial
-	#if io_halt_on_6502
+	#if io_halt_on_6510
 		#if io_prtstatus
 			jsr	primm
 			.text	@". Incompatible, stopping\$00"

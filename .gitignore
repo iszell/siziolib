@@ -9,6 +9,5 @@ ByteDump.txt
 *.log
 *.sym
 *.bak
-make
 !sd2iec/*
 !testdisk.d*

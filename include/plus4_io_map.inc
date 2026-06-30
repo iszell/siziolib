@@ -15,6 +15,7 @@
 //  0   Out Serial Data Out                        (0=High, 1=Low) (Inverted)
 .label	cpu_port	= $1
 
+#define HAS_ACIA
 .label	acia_base	= $fd00
 .namespace	acia	{
 	.label	data	= acia_base + 0
