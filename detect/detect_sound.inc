@@ -356,7 +356,7 @@ detect_fm: {
 		jsr detect_opl
 		bcc !+
 		lda fm_card_type
-		beq !++
+		bne !++
 		jmp notfound
 	!:	lda fm_card_type
 		beq !+
