@@ -266,7 +266,7 @@ ay_found:
 	#endif
 
 	clc
-	.byte BIT_ZP
+	rts
 noay:
 	sec
 	lda #0
@@ -280,13 +280,10 @@ check_ay: {
 		bpl !+
 		pha
 		jsr primm
-		.text @"?AY: \$00"
+		.text @"?AY:   \$00"
 		lda ay_address
 		ldx ay_address+1
 		jsr printaddr
-		lda #':'
-		jsr chrout
-		jsr prtspace
 		pla
 		pha
 		jsr hexbout
@@ -427,13 +424,10 @@ notfound:
 			bit debug_mode
 			bpl !+
 			jsr primm
-			.text @"?FM: \$00"
-			lda addressptr+1
-			jsr hexbout
+			.text @"?FM:   \$00"
 			lda addressptr
-			jsr hexbout
-			lda #':'
-			jsr chrout
+			ldx addressptr+1
+			jsr printaddr
 		!:
 		#endif
 
@@ -612,7 +606,7 @@ detect_dac: {
 		bit debug_mode
 		bpl !+
 		jsr primm
-		.text @"?DAC: \$00"
+		.text @"?DAC:  \$00"
 		lda dac1
 		jsr hexbout
 		jsr prtspace
@@ -681,7 +675,10 @@ detect_sid_address: {
 		bpl !+
 		pha
 		jsr primm
-		.text @"?SID: \$00"
+		.text @"?SID:  \$00"
+		lda sidptr
+		ldx sidptr+1
+		jsr printaddr
 		pla
 		jsr hexbout
 		jsr prtspace
@@ -792,23 +789,6 @@ notfound:
 #endif
 
 #import "detect_acia.inc"
-
-#if io_prtstatus
-	printaddr: {
-		pha
-//		lda #'@'
-//		jsr chrout
-		lda #'$'
-		jsr chrout
-		txa
-		jsr hexbout
-		pla
-		jsr hexbout
-		lda #':'
-		jsr chrout
-		jmp prtspace
-	}
-#endif
 
 }
 }

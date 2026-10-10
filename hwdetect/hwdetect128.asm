@@ -4,7 +4,7 @@
 
 	.encoding	"petscii_mixed"
 
-.label	ptr	= 4
+.label	ptr	= $fb
 
 	.print "C128 BASIC header"
 	* = $1C01 "BASIC header"

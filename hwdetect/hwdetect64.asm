@@ -4,7 +4,7 @@
 
 	.encoding	"petscii_mixed"
 
-.label	ptr	= 4
+.label	ptr	= $fb
 
 	BasicUpstart2(start)
 start:	jsr	primm
@@ -27,7 +27,8 @@ primm:	{
 	beq	end
 	jsr	chrout
 	jmp	!--
-end:	lda	ptr+1
+end:
+	lda	ptr+1
 	pha
 	lda	ptr
 	pha

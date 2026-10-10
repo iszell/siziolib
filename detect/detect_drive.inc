@@ -717,7 +717,7 @@ writemem:
 			cmp #9
 			bne nodevice
 			sta c16stmdevice
-			ldy	#13
+			ldy	#C16STM
 			sty	io_drivetyp
 			clc
 			rts
@@ -888,7 +888,7 @@ io_drivestsstr:
 	.byte	SD2IEC
 	.text	@"yape\$00\$00\$00"
 	.byte	YAPEIEC
-	.text	@"tcbm2sd"
+	.text	"tcbm2sd"
 	.byte	TCBM2SD
 //	.text	"tdisk"
 //	.byte	0, 0, 10 // SD2IEC test

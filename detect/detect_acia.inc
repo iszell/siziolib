@@ -34,12 +34,9 @@
 			bpl !+
 			jsr primm
 			.text @"?ACIA: \$00"
-			lda addressptr+1
-			jsr hexbout
 			lda addressptr
-			jsr hexbout
-			lda #':'
-			jsr chrout
+			ldx addressptr+1
+			jsr printaddr
 		!:
 		#endif
 		ldy #(acia.status - acia_base)

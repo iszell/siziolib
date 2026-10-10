@@ -533,15 +533,30 @@ init: {
 #endif
 
 #if io_prtstatus
-prtspace: {
-	lda #' '
-	jmp chrout
-}
+	prtspace: {
+		lda #' '
+		jmp chrout
+	}
 
-prtcr: {
-	lda #13
-	jmp chrout
-}
+	prtcr: {
+		lda #13
+		jmp chrout
+	}
+
+	printaddr: {
+		pha
+//		lda #'@'
+//		jsr chrout
+		lda #'$'
+		jsr chrout
+		txa
+		jsr hexbout
+		pla
+		jsr hexbout
+		lda #':'
+		jsr chrout
+		jmp prtspace
+	}
 #endif
 
 #if io_detect_acia
