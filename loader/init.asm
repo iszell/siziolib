@@ -27,14 +27,14 @@
 
 bootcode: .pseudopc $fe8 {
 	jsr	iolib.decrunch
-	sta	ted.romen
-	cli
 	bcs	error
 	jmp	$100d
 	
 error:
 	lda	#$32
 	sta	ted.border
+	sta	ted.romen
+	cli
 	rts
 }
 
