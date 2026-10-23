@@ -22,20 +22,27 @@
 startload:
 	stx filename
 	sty filename+1
-	
-	ldx io_tcbmoffs
+	tya					// quit loader if both characters of filename are $00
+	ora filename
+	bne !+
+	clc
+	rts
+
+!:	ldx io_tcbmoffs
 
 	jsr open
-	lda pbdta,x	// STATUS
-	and #3
-	beq !+
-	sec
-	bcs err
-!:	jsr talk
+	jsr talk
 	lda #$60			// SECOND 0
 	jsr secondary
 
 	jsr getbyte
+	tay
+	lda eofmarker
+	and #3
+	beq !+
+	sec
+	bcs err
+!:	tya
 #if need_loadflag
 	bit iolib.io_loadflag
 	bpl !+

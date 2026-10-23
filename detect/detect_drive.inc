@@ -890,8 +890,8 @@ io_drivestsstr:
 	.byte	YAPEIEC
 	.text	"tcbm2sd"
 	.byte	TCBM2SD
-//	.text	"tdisk"
-//	.byte	0, 0, 10 // SD2IEC test
+//	.text	@"tdisk\$00\$00"
+//	.byte	TCBM2SD // YAPE IEC test
 io_drivestsstre:
 
 // Format: drive type, interface type
